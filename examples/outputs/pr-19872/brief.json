@@ -1,0 +1,3596 @@
+{
+  "schema_version": "0.1.0",
+  "generated_at": "2026-05-09T23:32:37.044393Z",
+  "generator": "prex 0.2.0",
+  "pr": {
+    "url": "https://github.com/connectlyai/connectly-backend/pull/19872",
+    "repo": "connectlyai/connectly-backend",
+    "number": 19872,
+    "title": "feat[talk] add per-persona RPCs with copy-on-write for SOP suites",
+    "body": null,
+    "author": "nicohoz",
+    "base_ref": "main",
+    "head_ref": "feat/talk-per-persona-rpcs",
+    "base_sha": "f1d7ea0f32352ad21ca251faf09a85abdb53025a",
+    "head_sha": "cf5d4bbf27284cada59747585edcb75bdb415596",
+    "additions": 1894,
+    "deletions": 233,
+    "changed_files": 13
+  },
+  "review": {
+    "pr_type": "feat",
+    "pr_type_confidence": 0.95,
+    "pr_type_evidence": [
+      {
+        "kind": "external_doc",
+        "ref": "https://github.com/connectlyai/connectly-backend/pull/19872",
+        "excerpt": "title: feat[talk] add per-persona RPCs with copy-on-write for SOP suites",
+        "derivation": "heuristic",
+        "score": 0.95
+      }
+    ],
+    "risk_tier": "standard",
+    "risk_score": 0.5,
+    "blast_radius": {
+      "caller_files": 3,
+      "modules_crossed": 2,
+      "public_symbols_modified": 8,
+      "external_refs_added": 0
+    },
+    "novelty": {
+      "new_files": 0,
+      "new_symbols": 7,
+      "new_external_refs": 0
+    },
+    "headline": "Adds per-persona RPCs with copy-on-write for SOP suites, modifying 8 public symbols and 3 caller files.",
+    "advisory_flags": [
+      "no_test_coverage_changed",
+      "secret_like_string_added",
+      "no_docs_for_public_api"
+    ],
+    "cites": [
+      {
+        "kind": "external_doc",
+        "ref": "https://github.com/connectlyai/connectly-backend/pull/19872",
+        "excerpt": "title: feat[talk] add per-persona RPCs with copy-on-write for SOP suites",
+        "derivation": "heuristic",
+        "score": 0.95
+      },
+      {
+        "kind": "external_doc",
+        "ref": "https://github.com/connectlyai/connectly-backend/pull/19872",
+        "excerpt": "Adds per-persona RPCs with copy-on-write for SOP suites, modifying 8 public symbols and 3 caller files.",
+        "derivation": "llm",
+        "score": 0.85
+      }
+    ]
+  },
+  "plan": {
+    "overview": "This PR introduces new per-persona RPCs to the `talk` service, enabling operations like creating, updating, and deleting personas. It involves significant changes to the core Python `TalkService` and its associated test controller. The changes also include updates to generated Go protobuf and gRPC files to expose these new functionalities.",
+    "steps": [
+      {
+        "rank": 1,
+        "target": "symbol:python.rpc.rpc.talk.service.TalkService",
+        "title": "Modify TalkService Class",
+        "what": "This step modifies the `TalkService` class, which is the core Python RPC service for talk-related functionalities. The changes span a significant portion of the class, from line 25 to 217.",
+        "why": "This is a feature PR aiming to add per-persona RPCs. Modifying the main service class is a foundational step to introduce new RPC methods and their underlying logic.",
+        "impact": "This class is called by `python/rpc/rpc/main.py`, indicating it's a central component of the RPC server. The changes affect 2 modules and 3 caller files.",
+        "estimated_minutes": 2,
+        "risk_signals": [],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.7965
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService",
+            "excerpt": "Modify TalkService Class",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService",
+            "excerpt": "This step modifies the `TalkService` class, which is the core Python RPC service for talk-related functionalities. The c",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService",
+            "excerpt": "This is a feature PR aiming to add per-persona RPCs. Modifying the main service class is a foundational step to introduc",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService",
+            "excerpt": "This class is called by `python/rpc/rpc/main.py`, indicating it's a central component of the RPC server. The changes aff",
+            "derivation": "llm",
+            "score": 0.85
+          }
+        ]
+      },
+      {
+        "rank": 2,
+        "target": "symbol:python.rpc.rpc.talk.service.TalkService.DeletePersona",
+        "title": "Add DeletePersona RPC Method",
+        "what": "A new method, `DeletePersona`, is added to the `TalkService` class. This method is responsible for handling the deletion of a persona.",
+        "why": "This change directly implements one of the \"per-persona RPCs\" mentioned in the PR title. It provides functionality to remove persona data.",
+        "impact": "This new method is exposed via the `TalkServiceStub`, meaning it's a public API. This contributes to the 8 public symbols modified by this PR.",
+        "estimated_minutes": 2,
+        "risk_signals": [],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService.DeletePersona",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.7094999999999999
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService.DeletePersona",
+            "excerpt": "Add DeletePersona RPC Method",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService.DeletePersona",
+            "excerpt": "A new method, `DeletePersona`, is added to the `TalkService` class. This method is responsible for handling the deletion",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService.DeletePersona",
+            "excerpt": "This change directly implements one of the \"per-persona RPCs\" mentioned in the PR title. It provides functionality to re",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService.DeletePersona",
+            "excerpt": "This new method is exposed via the `TalkServiceStub`, meaning it's a public API. This contributes to the 8 public symbol",
+            "derivation": "llm",
+            "score": 0.85
+          }
+        ]
+      },
+      {
+        "rank": 3,
+        "target": "symbol:python.rpc.rpc.talk.service.TalkService.UpsertPersona",
+        "title": "Add UpsertPersona RPC Method",
+        "what": "A new method, `UpsertPersona`, is introduced within the `TalkService` class. This method handles both the creation and updating of persona data.",
+        "why": "This change directly implements another \"per-persona RPC\" as described in the PR title. It provides the core functionality for managing persona data.",
+        "impact": "Similar to `DeletePersona`, this method is exposed via `TalkServiceStub`, making it a public API. This contributes to the 8 public symbols modified.",
+        "estimated_minutes": 2,
+        "risk_signals": [],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService.UpsertPersona",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.708
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService.UpsertPersona",
+            "excerpt": "Add UpsertPersona RPC Method",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService.UpsertPersona",
+            "excerpt": "A new method, `UpsertPersona`, is introduced within the `TalkService` class. This method handles both the creation and u",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService.UpsertPersona",
+            "excerpt": "This change directly implements another \"per-persona RPC\" as described in the PR title. It provides the core functionali",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.service.TalkService.UpsertPersona",
+            "excerpt": "Similar to `DeletePersona`, this method is exposed via `TalkServiceStub`, making it a public API. This contributes to th",
+            "derivation": "llm",
+            "score": 0.85
+          }
+        ]
+      },
+      {
+        "rank": 4,
+        "target": "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController",
+        "title": "Modify TalkTestSuiteController",
+        "what": "The `TalkTestSuiteController` class has been significantly modified, spanning almost its entire definition. This class likely manages test suites related to talk functionalities.",
+        "why": "Author did not state intent for this region. However, given the `pr_type: feat` and the addition of new RPCs, these changes likely involve integrating the new persona RPCs into existing test suites or adding new test cases.",
+        "impact": "This controller is called by `python/rpc/rpc/main.py`, suggesting it's part of the application's core logic or testing framework. The presence of `sql_in_changed_lines` indicates potential database interaction changes.",
+        "estimated_minutes": 2,
+        "risk_signals": [
+          "sql_in_changed_lines"
+        ],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.65
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController",
+            "excerpt": "Modify TalkTestSuiteController",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController",
+            "excerpt": "The `TalkTestSuiteController` class has been significantly modified, spanning almost its entire definition. This class l",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController",
+            "excerpt": "Author did not state intent for this region. However, given the `pr_type: feat` and the addition of new RPCs, these chan",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController",
+            "excerpt": "This controller is called by `python/rpc/rpc/main.py`, suggesting it's part of the application's core logic or testing f",
+            "derivation": "llm",
+            "score": 0.85
+          }
+        ]
+      },
+      {
+        "rank": 5,
+        "target": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#1",
+        "title": "Update Go Protobuf Definitions (service.pb.go)",
+        "what": "This step involves a specific hunk of changes within the generated Go protobuf file for the `talk` service. This file defines the data structures for RPC messages.",
+        "why": "As a feature PR adding new RPCs, changes to the protobuf definitions are necessary to define the request and response messages for the new `DeletePersona` and `UpsertPersona` RPCs.",
+        "impact": "This is a generated file, so direct callers are not listed, but it impacts any Go service consuming the `talk` RPCs. The `sql_in_changed_lines` signal suggests new fields might relate to database IDs or queries.",
+        "estimated_minutes": 2,
+        "risk_signals": [
+          "sql_in_changed_lines"
+        ],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#1",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.6
+          },
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#1",
+            "excerpt": "Update Go Protobuf Definitions (service.pb.go)",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#1",
+            "excerpt": "This step involves a specific hunk of changes within the generated Go protobuf file for the `talk` service. This file de",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#1",
+            "excerpt": "As a feature PR adding new RPCs, changes to the protobuf definitions are necessary to define the request and response me",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#1",
+            "excerpt": "This is a generated file, so direct callers are not listed, but it impacts any Go service consuming the `talk` RPCs. The",
+            "derivation": "llm",
+            "score": 0.85
+          }
+        ]
+      },
+      {
+        "rank": 6,
+        "target": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#1",
+        "title": "Update Go gRPC Service Definitions (service_grpc.pb.go)",
+        "what": "This step modifies a specific hunk in the generated Go gRPC service file for `talk`. This file defines the gRPC service interface and client/server stubs.",
+        "why": "To expose the new `DeletePersona` and `UpsertPersona` RPCs, the gRPC service definition must be updated in the generated code.",
+        "impact": "This is a generated file, but it directly impacts how Go clients and servers interact with the `talk` service. The `sql_in_changed_lines` signal is present.",
+        "estimated_minutes": 2,
+        "risk_signals": [
+          "sql_in_changed_lines"
+        ],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#1",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.6
+          },
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#1",
+            "excerpt": "Update Go gRPC Service Definitions (service_grpc.pb.go)",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#1",
+            "excerpt": "This step modifies a specific hunk in the generated Go gRPC service file for `talk`. This file defines the gRPC service ",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#1",
+            "excerpt": "To expose the new `DeletePersona` and `UpsertPersona` RPCs, the gRPC service definition must be updated in the generated",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#1",
+            "excerpt": "This is a generated file, but it directly impacts how Go clients and servers interact with the `talk` service. The `sql_",
+            "derivation": "llm",
+            "score": 0.85
+          }
+        ]
+      },
+      {
+        "rank": 7,
+        "target": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#3",
+        "title": "Further Go gRPC Service Updates (service_grpc.pb.go)",
+        "what": "This step involves another specific hunk of changes within the generated Go gRPC service file. This likely pertains to the implementation details or registration of the new RPC methods.",
+        "why": "This is a continuation of the previous step, ensuring the generated gRPC code correctly incorporates the new `DeletePersona` and `UpsertPersona` RPCs.",
+        "impact": "As a generated gRPC file, it affects the interface and implementation of the `talk` service for Go applications. The `sql_in_changed_lines` signal is present.",
+        "estimated_minutes": 2,
+        "risk_signals": [
+          "sql_in_changed_lines"
+        ],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#3",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.6
+          },
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#3",
+            "excerpt": "Further Go gRPC Service Updates (service_grpc.pb.go)",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#3",
+            "excerpt": "This step involves another specific hunk of changes within the generated Go gRPC service file. This likely pertains to t",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#3",
+            "excerpt": "This is a continuation of the previous step, ensuring the generated gRPC code correctly incorporates the new `DeletePers",
+            "derivation": "llm",
+            "score": 0.85
+          },
+          {
+            "kind": "node",
+            "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#3",
+            "excerpt": "As a generated gRPC file, it affects the interface and implementation of the `talk` service for Go applications. The `sq",
+            "derivation": "llm",
+            "score": 0.85
+          }
+        ]
+      }
+    ],
+    "cites": [
+      {
+        "kind": "external_doc",
+        "ref": "https://github.com/connectlyai/connectly-backend/pull/19872",
+        "excerpt": "This PR introduces new per-persona RPCs to the `talk` service, enabling operations like creating, updating, and deleting",
+        "derivation": "llm",
+        "score": 0.85
+      }
+    ]
+  },
+  "hunks": [
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L72-L78",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L655-L892",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L655-L892",
+          "excerpt": "// Deletes a single persona from a TestSuite. If removing the persona",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#2",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#2",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L911-L917",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#3",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#3",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L923-L929",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#4",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#4",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L936-L942",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#5",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#5",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L999-L1005",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#6",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#6",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1011-L1017",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#7",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#7",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1024-L1030",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#8",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#8",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1043-L1049",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#9",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#9",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1055-L1061",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#10",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#10",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1068-L1074",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#11",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#11",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1088-L1094",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#12",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#12",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1100-L1106",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#13",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#13",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1113-L1119",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#14",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#14",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1139-L1145",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#15",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#15",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1151-L1157",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#16",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#16",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1164-L1170",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#17",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#17",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1184-L1190",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#18",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#18",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1196-L1202",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#19",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#19",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1209-L1215",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#20",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#20",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1235-L1241",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#21",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#21",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1247-L1253",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#22",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#22",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1260-L1266",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#23",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#23",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1280-L1286",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#24",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#24",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1292-L1298",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#25",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#25",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1305-L1311",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#26",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#26",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1330-L1336",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#27",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#27",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1342-L1348",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#28",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#28",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1355-L1361",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#29",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#29",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1393-L1399",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#30",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#30",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1405-L1411",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#31",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#31",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1418-L1424",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#32",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#32",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1489-L1495",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#33",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#33",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1501-L1507",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#34",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#34",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1514-L1520",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#35",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#35",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1556-L1562",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#36",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#36",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1568-L1574",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#37",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#37",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1581-L1587",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#38",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#38",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1628-L1634",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#39",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#39",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1640-L1646",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#40",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#40",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1653-L1659",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#41",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#41",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1674-L1680",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#42",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#42",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1686-L1692",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#43",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#43",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1699-L1705",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#44",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#44",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1732-L1738",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#45",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#45",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1744-L1750",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#46",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#46",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1757-L1763",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#47",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#47",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1777-L1783",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#48",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#48",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1789-L1795",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#49",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#49",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1802-L1808",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#50",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#50",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1828-L1834",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#51",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#51",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1840-L1846",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#52",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#52",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1853-L1859",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#53",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#53",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1878-L1884",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#54",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#54",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1890-L1896",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#55",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#55",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1903-L1909",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#56",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#56",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1933-L1939",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#57",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#57",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1945-L1951",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#58",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#58",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1958-L1964",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#59",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#59",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L1990-L1996",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#60",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#60",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2002-L2008",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#61",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#61",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2015-L2021",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#62",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#62",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2079-L2085",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#63",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#63",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2091-L2097",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#64",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#64",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2104-L2110",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#65",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#65",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2152-L2158",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#66",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#66",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2164-L2170",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#67",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#67",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2177-L2183",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#68",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#68",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2223-L2229",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#69",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#69",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2235-L2241",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#70",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#70",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2248-L2254",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#71",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#71",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2278-L2284",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#72",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#72",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2290-L2296",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#73",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#73",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2303-L2309",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#74",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#74",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2363-L2369",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#75",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#75",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2375-L2381",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#76",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#76",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2388-L2394",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#77",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#77",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2467-L2493",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#78",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#78",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2608-L2623",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#79",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#79",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2645-L2651",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#80",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#80",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2660-L2771",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#81",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#81",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2773-L2783",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#82",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.go#82",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.go#L2786-L2792",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.gw.go#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.gw.go#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.gw.go#L335-L488",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.gw.go#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.gw.go#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.gw.go#L976-L1021",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.gw.go#2",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.gw.go#2",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.gw.go#L1298-L1337",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.gw.go#3",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.gw.go#3",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.gw.go#L1461-L1468",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.gw.go#4",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service.pb.gw.go#4",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service.pb.gw.go#L1479-L1486",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#L25-L32",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#L50-L62",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#L50-L62",
+          "excerpt": "// Deletes a single persona from a test suite. Same copy-on-write rules",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#2",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#2",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#L146-L171",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#3",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#3",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#L280-L292",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#L280-L292",
+          "excerpt": "// Deletes a single persona from a test suite. Same copy-on-write rules",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#4",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#4",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#L334-L345",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#5",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#5",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#L499-L540",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#6",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#6",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/service_grpc.pb.go#L746-L759",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/zz_generated.proto_json.go#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/zz_generated.proto_json.go#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/zz_generated.proto_json.go#L20-L37",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/go/services/ai/talk/v1/zz_generated.proto_json.go#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/go/services/ai/talk/v1/zz_generated.proto_json.go#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/go/services/ai/talk/v1/zz_generated.proto_json.go#L206-L223",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/openapiv2/services/ai/talk/v1/service.swagger.json#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/openapiv2/services/ai/talk/v1/service.swagger.json#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/openapiv2/services/ai/talk/v1/service.swagger.json#L486-L584",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/openapiv2/services/ai/talk/v1/service.swagger.json#L486-L584",
+          "excerpt": "\"summary\": \"Deletes a single persona from a test suite. Same copy-on-write rules\\nas UpsertPersona apply for SOP-attache",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/openapiv2/services/ai/talk/v1/service.swagger.json#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/openapiv2/services/ai/talk/v1/service.swagger.json#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/openapiv2/services/ai/talk/v1/service.swagger.json#L2644-L2662",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/openapiv2/services/ai/talk/v1/service.swagger.json#2",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/openapiv2/services/ai/talk/v1/service.swagger.json#2",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/openapiv2/services/ai/talk/v1/service.swagger.json#L2896-L2910",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/python/idl/services/ai/talk/v1/service_pb2.py#L18-L24",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2.py#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2.py#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/python/idl/services/ai/talk/v1/service_pb2.py#L102-L111",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2.py#2",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "secret_like_string"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2.py#2",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/python/idl/services/ai/talk/v1/service_pb2.py#L150-L215",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/python/idl/services/ai/talk/v1/service_pb2.py#L150-L215",
+          "excerpt": "(secret-shaped string redacted)",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2.pyi#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2.pyi#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/python/idl/services/ai/talk/v1/service_pb2.pyi#L235-L335",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/python/idl/services/ai/talk/v1/service_pb2.pyi#L235-L335",
+          "excerpt": "\"\"\"Deletes a single persona from a TestSuite. If removing the persona",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2_grpc.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2_grpc.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/python/idl/services/ai/talk/v1/service_pb2_grpc.py#L44-L59",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2_grpc.py#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2_grpc.py#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/python/idl/services/ai/talk/v1/service_pb2_grpc.py#L146-L168",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/python/idl/services/ai/talk/v1/service_pb2_grpc.py#L146-L168",
+          "excerpt": "\"\"\"Deletes a single persona from a test suite. Same copy-on-write rules",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2_grpc.py#2",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2_grpc.py#2",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/python/idl/services/ai/talk/v1/service_pb2_grpc.py#L262-L277",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2_grpc.py#3",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2_grpc.py#3",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/python/idl/services/ai/talk/v1/service_pb2_grpc.py#L434-L473",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/ts_proto/services/ai/talk/v1/service.ts#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/ts_proto/services/ai/talk/v1/service.ts#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/ts_proto/services/ai/talk/v1/service.ts#L20-L26",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/ts_proto/services/ai/talk/v1/service.ts#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/ts_proto/services/ai/talk/v1/service.ts#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/ts_proto/services/ai/talk/v1/service.ts#L84-L123",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/ts_proto/services/ai/talk/v1/service.ts#L84-L123",
+          "excerpt": "* Deletes a single persona from a TestSuite. If removing the persona",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/ts_proto/services/ai/talk/v1/service.ts#2",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/ts_proto/services/ai/talk/v1/service.ts#2",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/ts_proto/services/ai/talk/v1/service.ts#L1103-L1400",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/ts_proto/services/ai/talk/v1/service.ts#3",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/ts_proto/services/ai/talk/v1/service.ts#3",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/ts_proto/services/ai/talk/v1/service.ts#L3339-L3371",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/ts_proto/services/ai/talk/v1/service.ts#L3339-L3371",
+          "excerpt": "* Deletes a single persona from a test suite. Same copy-on-write rules",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/ts_proto/services/ai/talk/v1/service.ts#4",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/ts_proto/services/ai/talk/v1/service.ts#4",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/ts_proto/services/ai/talk/v1/service.ts#L3489-L3505",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/ts_proto/services/ai/talk/v1/service.ts#L3489-L3505",
+          "excerpt": "* Deletes a single persona from a test suite. Same copy-on-write rules",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/gen/ts_proto/services/ai/talk/v1/service.ts#5",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/gen/ts_proto/services/ai/talk/v1/service.ts#5",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/ts_proto/services/ai/talk/v1/service.ts#L3615-L3659",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/gen/ts_proto/services/ai/talk/v1/service.ts#L3615-L3659",
+          "excerpt": "* Deletes a single persona from a test suite. Same copy-on-write rules",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/services/ai/talk/v1/service.proto#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/services/ai/talk/v1/service.proto#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/services/ai/talk/v1/service.proto#L65-L88",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/services/ai/talk/v1/service.proto#L65-L88",
+          "excerpt": "// Deletes a single persona from a test suite. Same copy-on-write rules",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:idl/services/ai/talk/v1/service.proto#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:idl/services/ai/talk/v1/service.proto#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/services/ai/talk/v1/service.proto#L207-L242",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "idl/services/ai/talk/v1/service.proto#L207-L242",
+          "excerpt": "// Deletes a single persona from a TestSuite. If removing the persona",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/rpc/rpc/talk/controllers/talk_test_suite.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController",
+        "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController.list_test_suites"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/rpc/rpc/talk/controllers/talk_test_suite.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/rpc/rpc/talk/controllers/talk_test_suite.py#L57-L67",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/rpc/rpc/talk/controllers/talk_test_suite.py#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines"
+      ],
+      "affects_public_symbol_ids": [
+        "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController",
+        "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController.upsert_persona",
+        "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController.delete_persona"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/rpc/rpc/talk/controllers/talk_test_suite.py#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/rpc/rpc/talk/controllers/talk_test_suite.py#L174-L238",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/rpc/rpc/talk/controllers/talk_test_suite.py#L174-L238",
+          "excerpt": "# row entirely. When it came from an SOP we still persist the empty",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/rpc/rpc/talk/controllers/talk_test_suite.py#2",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.PersonaNotFoundError"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/rpc/rpc/talk/controllers/talk_test_suite.py#2",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/rpc/rpc/talk/controllers/talk_test_suite.py#L290-L300",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/rpc/rpc/talk/service.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/rpc/rpc/talk/service.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/rpc/rpc/talk/service.py#L7-L13",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/rpc/rpc/talk/service.py#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.rpc.rpc.talk.service.TalkService",
+        "symbol:python.rpc.rpc.talk.service.TalkService.UpsertPersona",
+        "symbol:python.rpc.rpc.talk.service.TalkService.DeletePersona"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/rpc/rpc/talk/service.py#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/rpc/rpc/talk/service.py#L96-L138",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    }
+  ],
+  "checklist": [
+    {
+      "type": null,
+      "checklist_items": [
+        {
+          "id": "public_symbol_modified_without_test",
+          "text": "Public symbol changed but no test was modified or added.",
+          "required": false,
+          "targets": [
+            "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController",
+            "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController.list_test_suites",
+            "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController.upsert_persona",
+            "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController.delete_persona",
+            "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.PersonaNotFoundError",
+            "symbol:python.rpc.rpc.talk.service.TalkService",
+            "symbol:python.rpc.rpc.talk.service.TalkService.UpsertPersona",
+            "symbol:python.rpc.rpc.talk.service.TalkService.DeletePersona"
+          ],
+          "auto_status": "fail",
+          "auto_evidence": {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController",
+            "excerpt": "8 public symbol(s) changed, no test symbol modified.",
+            "derivation": "manifest",
+            "score": 1.0
+          }
+        },
+        {
+          "id": "external_ref_added",
+          "text": "PR introduces a new external dependency (DB table, HTTP route, etc.). Confirm the dependency is safe and reviewed.",
+          "required": false,
+          "targets": [],
+          "auto_status": "pass",
+          "auto_evidence": null
+        },
+        {
+          "id": "assertion_removed",
+          "text": "An `assert` was removed from a test. Verify the assertion is no longer relevant.",
+          "required": true,
+          "targets": [],
+          "auto_status": "pass",
+          "auto_evidence": null
+        },
+        {
+          "id": "broad_except_added",
+          "text": "Bare `except:` or `except Exception` was added. Narrow the exception unless intentional.",
+          "required": false,
+          "targets": [],
+          "auto_status": "pass",
+          "auto_evidence": null
+        },
+        {
+          "id": "secret_like_string_added",
+          "text": "A high-entropy token-like literal was added. Likely a secret leak — move to env/secret manager.",
+          "required": true,
+          "targets": [
+            "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2.py#2"
+          ],
+          "auto_status": "fail",
+          "auto_evidence": {
+            "kind": "node",
+            "ref": "hunk:idl/gen/python/idl/services/ai/talk/v1/service_pb2.py#2",
+            "excerpt": "A high-entropy / SDK-token-shaped literal was added.",
+            "derivation": "manifest",
+            "score": 1.0
+          }
+        },
+        {
+          "id": "no_doc_change_for_public_api",
+          "text": "Public API touched but no docs/*.md changed. Add or update documentation.",
+          "required": false,
+          "targets": [
+            "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController",
+            "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController.list_test_suites",
+            "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController.upsert_persona",
+            "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController.delete_persona",
+            "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.PersonaNotFoundError",
+            "symbol:python.rpc.rpc.talk.service.TalkService",
+            "symbol:python.rpc.rpc.talk.service.TalkService.UpsertPersona",
+            "symbol:python.rpc.rpc.talk.service.TalkService.DeletePersona"
+          ],
+          "auto_status": "fail",
+          "auto_evidence": {
+            "kind": "node",
+            "ref": "symbol:python.rpc.rpc.talk.controllers.talk_test_suite.TalkTestSuiteController",
+            "excerpt": "No file under /docs/ or *.md was changed alongside this public-API PR.",
+            "derivation": "manifest",
+            "score": 1.0
+          }
+        },
+        {
+          "id": "feature_flag_added",
+          "text": "A new feature flag was introduced. Document the kill-switch and cleanup ticket.",
+          "required": false,
+          "targets": [],
+          "auto_status": "unknown",
+          "auto_evidence": null
+        },
+        {
+          "id": "feature_flag_removed",
+          "text": "A feature flag was removed. Confirm rollout has reached 100% in all environments.",
+          "required": false,
+          "targets": [],
+          "auto_status": "unknown",
+          "auto_evidence": null
+        }
+      ]
+    }
+  ],
+  "graph_ref": "graph.json",
+  "diagnostics": [
+    {
+      "level": "warn",
+      "code": "LLM_BRIEF_HUNK_BATCH_FAILED",
+      "message": "LLM hunk-summary batch failed (offset 0).",
+      "related_node_ids": []
+    },
+    {
+      "level": "info",
+      "code": "LLM_BRIEF_SUMMARY",
+      "message": "Filled 0 hunk insights, headline=yes, plan steps 7/7.",
+      "related_node_ids": []
+    }
+  ],
+  "llm_used": true
+}

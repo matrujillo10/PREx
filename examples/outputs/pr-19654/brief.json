@@ -1,0 +1,1646 @@
+{
+  "schema_version": "0.1.0",
+  "generated_at": "2026-05-09T23:33:08.289154Z",
+  "generator": "prex 0.2.0",
+  "pr": {
+    "url": "https://github.com/connectlyai/connectly-backend/pull/19654",
+    "repo": "connectlyai/connectly-backend",
+    "number": 19654,
+    "title": "feat[team-agents]: Instruments product ingestion with OTEL metrics",
+    "body": null,
+    "author": "msnidal",
+    "base_ref": "main",
+    "head_ref": "msnidal/stack/79",
+    "base_sha": "79a8e9cdba00dd12a20a1c0ac2416670ccd7fc3f",
+    "head_sha": "947bb5231315b94a799a28231654a5638eeb803b",
+    "additions": 568,
+    "deletions": 18,
+    "changed_files": 10
+  },
+  "review": {
+    "pr_type": "feat",
+    "pr_type_confidence": 0.95,
+    "pr_type_evidence": [
+      {
+        "kind": "external_doc",
+        "ref": "https://github.com/connectlyai/connectly-backend/pull/19654",
+        "excerpt": "title: feat[team-agents]: Instruments product ingestion with OTEL metrics",
+        "derivation": "heuristic",
+        "score": 0.95
+      }
+    ],
+    "risk_tier": "sensitive",
+    "risk_score": 0.6,
+    "blast_radius": {
+      "caller_files": 11,
+      "modules_crossed": 11,
+      "public_symbols_modified": 6,
+      "external_refs_added": 0
+    },
+    "novelty": {
+      "new_files": 0,
+      "new_symbols": 9,
+      "new_external_refs": 0
+    },
+    "headline": null,
+    "advisory_flags": [
+      "no_test_coverage_changed",
+      "broad_except_added",
+      "no_docs_for_public_api"
+    ],
+    "cites": [
+      {
+        "kind": "external_doc",
+        "ref": "https://github.com/connectlyai/connectly-backend/pull/19654",
+        "excerpt": "title: feat[team-agents]: Instruments product ingestion with OTEL metrics",
+        "derivation": "heuristic",
+        "score": 0.95
+      }
+    ]
+  },
+  "plan": {
+    "overview": null,
+    "steps": [
+      {
+        "rank": 1,
+        "target": "symbol:python.tenets.tenets.tracing.aws_lambda_instrumentor.aws_lambda_instrumentor",
+        "title": null,
+        "what": null,
+        "why": null,
+        "impact": null,
+        "estimated_minutes": 2,
+        "risk_signals": [],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "symbol:python.tenets.tenets.tracing.aws_lambda_instrumentor.aws_lambda_instrumentor",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.7144999999999999
+          }
+        ]
+      },
+      {
+        "rank": 2,
+        "target": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#14",
+        "title": null,
+        "what": null,
+        "why": null,
+        "impact": null,
+        "estimated_minutes": 2,
+        "risk_signals": [
+          "broad_except"
+        ],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#14",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.6
+          }
+        ]
+      },
+      {
+        "rank": 3,
+        "target": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#3",
+        "title": null,
+        "what": null,
+        "why": null,
+        "impact": null,
+        "estimated_minutes": 2,
+        "risk_signals": [
+          "broad_except"
+        ],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#3",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.6
+          }
+        ]
+      },
+      {
+        "rank": 4,
+        "target": "hunk:python/tenets/tenets/observability/telemetry.py#0",
+        "title": null,
+        "what": null,
+        "why": null,
+        "impact": null,
+        "estimated_minutes": 2,
+        "risk_signals": [
+          "broad_except"
+        ],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "hunk:python/tenets/tenets/observability/telemetry.py#0",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.6
+          }
+        ]
+      },
+      {
+        "rank": 5,
+        "target": "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.upsert_products",
+        "title": null,
+        "what": null,
+        "why": null,
+        "impact": null,
+        "estimated_minutes": 2,
+        "risk_signals": [],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.upsert_products",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.49133333333333334
+          }
+        ]
+      },
+      {
+        "rank": 6,
+        "target": "symbol:python.ocean_beach.ocean_beach.product_utils.indices.category_mapping_qdrant.CategoryMappingQdrantIndex.async_upsert",
+        "title": null,
+        "what": null,
+        "why": null,
+        "impact": null,
+        "estimated_minutes": 2,
+        "risk_signals": [],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "symbol:python.ocean_beach.ocean_beach.product_utils.indices.category_mapping_qdrant.CategoryMappingQdrantIndex.async_upsert",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.47950000000000004
+          }
+        ]
+      },
+      {
+        "rank": 7,
+        "target": "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.main",
+        "title": null,
+        "what": null,
+        "why": null,
+        "impact": null,
+        "estimated_minutes": 2,
+        "risk_signals": [],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.main",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.4615
+          }
+        ]
+      }
+    ],
+    "cites": []
+  },
+  "hunks": [
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#L41-L47",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#L57-L63",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#2",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#2",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#L70-L117",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#3",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.upsert_products"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#3",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#L364-L379",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#4",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.upsert_products"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#4",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#L392-L403",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#5",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.upsert_products"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#5",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#L407-L415",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#6",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.upsert_products"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#6",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#L427-L438",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#7",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.upsert_products"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#7",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#L451-L462",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#8",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.upsert_products"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#8",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#L464-L478",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#9",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.main"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#9",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#L622-L628",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#10",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.main"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#10",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#L635-L641",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#11",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.main"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#11",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#L652-L684",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#12",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.main"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#12",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#L690-L720",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#13",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.main"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#13",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/aws_batch_product_catalog_scraper/main.py#L726-L738",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/aws_batch/jobs/product_catalog_scraper/job_def.jq#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/aws_batch/jobs/product_catalog_scraper/job_def.jq#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/aws_batch/jobs/product_catalog_scraper/job_def.jq#L40-L57",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L1-L7",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#1",
+      "one_liner": "Initializes OpenTelemetry metrics and defines counters for product ingestion stages.",
+      "intent": "adds_capability",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L44-L125",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#1",
+          "excerpt": "Initializes OpenTelemetry metrics and defines counters for product ingestion stages.",
+          "derivation": "llm",
+          "score": 0.85
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#2",
+      "one_liner": "Adds metric to count received records during the product loading stage.",
+      "intent": "adds_capability",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#2",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L141-L149",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#2",
+          "excerpt": "Adds metric to count received records during the product loading stage.",
+          "derivation": "llm",
+          "score": 0.85
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#3",
+      "one_liner": "Adds metric to count products loaded after processing raw records.",
+      "intent": "adds_capability",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#3",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L162-L168",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#3",
+          "excerpt": "Adds metric to count products loaded after processing raw records.",
+          "derivation": "llm",
+          "score": 0.85
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#4",
+      "one_liner": "Adds metrics to track products by title normalization status (needed, already, ineligible).",
+      "intent": "adds_capability",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#4",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L217-L241",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#4",
+          "excerpt": "Adds metrics to track products by title normalization status (needed, already, ineligible).",
+          "derivation": "llm",
+          "score": 0.85
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#5",
+      "one_liner": "Adds metric to count products successfully normalized by title.",
+      "intent": "adds_capability",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#5",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L263-L274",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#5",
+          "excerpt": "Adds metric to count products successfully normalized by title.",
+          "derivation": "llm",
+          "score": 0.85
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#6",
+      "one_liner": "Adds metric to count products where title normalization failed.",
+      "intent": "adds_capability",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#6",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L285-L296",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#6",
+          "excerpt": "Adds metric to count products where title normalization failed.",
+          "derivation": "llm",
+          "score": 0.85
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#7",
+      "one_liner": "Adds metrics to track products by promotion title normalization status.",
+      "intent": "adds_capability",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#7",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L325-L359",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#7",
+          "excerpt": "Adds metrics to track products by promotion title normalization status.",
+          "derivation": "llm",
+          "score": 0.85
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#8",
+      "one_liner": "Adds metric to count products with successfully normalized promotion titles.",
+      "intent": "adds_capability",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#8",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L387-L398",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#8",
+          "excerpt": "Adds metric to count products with successfully normalized promotion titles.",
+          "derivation": "llm",
+          "score": 0.85
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#9",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#9",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L408-L419",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#10",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#10",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L457-L487",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#11",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#11",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L490-L538",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#12",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#12",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L637-L648",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#13",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#13",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L688-L699",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#14",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "broad_except"
+      ],
+      "affects_public_symbol_ids": [
+        "symbol:python.awslambda.product_ingestion.aws_lambda_product_ingestion.app.handler"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#14",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L769-L788",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#L769-L788",
+          "excerpt": "except Exception:",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#L4-L10",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#L25-L47",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#2",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.ocean_beach.ocean_beach.product_utils.indices.category_mapping_qdrant.CategoryMappingQdrantIndex",
+        "symbol:python.ocean_beach.ocean_beach.product_utils.indices.category_mapping_qdrant.CategoryMappingQdrantIndex.async_upsert"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#2",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#L353-L374",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#3",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.ocean_beach.ocean_beach.product_utils.indices.category_mapping_qdrant.CategoryMappingQdrantIndex",
+        "symbol:python.ocean_beach.ocean_beach.product_utils.indices.category_mapping_qdrant.CategoryMappingQdrantIndex.async_upsert"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#3",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#L376-L384",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#4",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.ocean_beach.ocean_beach.product_utils.indices.category_mapping_qdrant.CategoryMappingQdrantIndex",
+        "symbol:python.ocean_beach.ocean_beach.product_utils.indices.category_mapping_qdrant.CategoryMappingQdrantIndex.async_upsert"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#4",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/product_utils/indices/category_mapping_qdrant.py#L403-L416",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#L46-L52",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#L78-L100",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#2",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.ocean_beach.ocean_beach.product_utils.indices.product_v1_qdrant.ProductQdrantV1VectorIndex"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#2",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#L450-L492",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#3",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "broad_except"
+      ],
+      "affects_public_symbol_ids": [
+        "symbol:python.ocean_beach.ocean_beach.product_utils.indices.product_v1_qdrant.ProductQdrantV1VectorIndex"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#3",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#L514-L531",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#L514-L531",
+          "excerpt": "except Exception:",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/run#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/run#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/run#L592-L600",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/sdks/sdks/cdn/file_manager.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/sdks/sdks/cdn/file_manager.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/sdks/sdks/cdn/file_manager.py#L5-L11",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/sdks/sdks/cdn/file_manager.py#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/sdks/sdks/cdn/file_manager.py#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/sdks/sdks/cdn/file_manager.py#L13-L34",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/sdks/sdks/cdn/file_manager.py#2",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.sdks.sdks.cdn.file_manager.CDNFileManager"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/sdks/sdks/cdn/file_manager.py#2",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/sdks/sdks/cdn/file_manager.py#L130-L141",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/sdks/sdks/cdn/file_manager.py#3",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.sdks.sdks.cdn.file_manager.CDNFileManager"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/sdks/sdks/cdn/file_manager.py#3",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/sdks/sdks/cdn/file_manager.py#L144-L154",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/sdks/sdks/cdn/file_manager.py#4",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.sdks.sdks.cdn.file_manager.CDNFileManager"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/sdks/sdks/cdn/file_manager.py#4",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/sdks/sdks/cdn/file_manager.py#L168-L176",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/sdks/sdks/cdn/file_manager.py#5",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.sdks.sdks.cdn.file_manager.CDNFileManager"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/sdks/sdks/cdn/file_manager.py#5",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/sdks/sdks/cdn/file_manager.py#L179-L192",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/tenets/tenets/observability/telemetry.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "broad_except"
+      ],
+      "affects_public_symbol_ids": [
+        "symbol:python.tenets.tenets.observability.telemetry.otlp_force_flush"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/tenets/tenets/observability/telemetry.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/tenets/tenets/observability/telemetry.py#L353-L373",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/tenets/tenets/observability/telemetry.py#L353-L373",
+          "excerpt": "except Exception as e:",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/tenets/tenets/tracing/aws_lambda_instrumentor.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [
+        "symbol:python.tenets.tenets.tracing.aws_lambda_instrumentor.aws_lambda_instrumentor"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/tenets/tenets/tracing/aws_lambda_instrumentor.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/tenets/tenets/tracing/aws_lambda_instrumentor.py#L35-L41",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    }
+  ],
+  "checklist": [
+    {
+      "type": null,
+      "checklist_items": [
+        {
+          "id": "public_symbol_modified_without_test",
+          "text": "Public symbol changed but no test was modified or added.",
+          "required": false,
+          "targets": [
+            "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.upsert_products",
+            "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.main",
+            "symbol:python.awslambda.product_ingestion.aws_lambda_product_ingestion.app.handler",
+            "symbol:python.ocean_beach.ocean_beach.product_utils.indices.category_mapping_qdrant.CategoryMappingQdrantIndex.async_upsert",
+            "symbol:python.tenets.tenets.observability.telemetry.otlp_force_flush",
+            "symbol:python.tenets.tenets.tracing.aws_lambda_instrumentor.aws_lambda_instrumentor"
+          ],
+          "auto_status": "fail",
+          "auto_evidence": {
+            "kind": "node",
+            "ref": "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.upsert_products",
+            "excerpt": "6 public symbol(s) changed, no test symbol modified.",
+            "derivation": "manifest",
+            "score": 1.0
+          }
+        },
+        {
+          "id": "external_ref_added",
+          "text": "PR introduces a new external dependency (DB table, HTTP route, etc.). Confirm the dependency is safe and reviewed.",
+          "required": false,
+          "targets": [],
+          "auto_status": "pass",
+          "auto_evidence": null
+        },
+        {
+          "id": "assertion_removed",
+          "text": "An `assert` was removed from a test. Verify the assertion is no longer relevant.",
+          "required": true,
+          "targets": [],
+          "auto_status": "pass",
+          "auto_evidence": null
+        },
+        {
+          "id": "broad_except_added",
+          "text": "Bare `except:` or `except Exception` was added. Narrow the exception unless intentional.",
+          "required": false,
+          "targets": [
+            "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#14",
+            "hunk:python/ocean_beach/ocean_beach/product_utils/indices/product_v1_qdrant.py#3",
+            "hunk:python/tenets/tenets/observability/telemetry.py#0"
+          ],
+          "auto_status": "fail",
+          "auto_evidence": {
+            "kind": "node",
+            "ref": "hunk:python/awslambda/product_ingestion/aws_lambda_product_ingestion/app.py#14",
+            "excerpt": "Bare `except:` or `except Exception` introduced.",
+            "derivation": "manifest",
+            "score": 1.0
+          }
+        },
+        {
+          "id": "secret_like_string_added",
+          "text": "A high-entropy token-like literal was added. Likely a secret leak — move to env/secret manager.",
+          "required": true,
+          "targets": [],
+          "auto_status": "pass",
+          "auto_evidence": null
+        },
+        {
+          "id": "no_doc_change_for_public_api",
+          "text": "Public API touched but no docs/*.md changed. Add or update documentation.",
+          "required": false,
+          "targets": [
+            "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.upsert_products",
+            "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.main",
+            "symbol:python.awslambda.product_ingestion.aws_lambda_product_ingestion.app.handler",
+            "symbol:python.ocean_beach.ocean_beach.product_utils.indices.category_mapping_qdrant.CategoryMappingQdrantIndex.async_upsert",
+            "symbol:python.tenets.tenets.observability.telemetry.otlp_force_flush",
+            "symbol:python.tenets.tenets.tracing.aws_lambda_instrumentor.aws_lambda_instrumentor"
+          ],
+          "auto_status": "fail",
+          "auto_evidence": {
+            "kind": "node",
+            "ref": "symbol:python.aws_batch.jobs.product_catalog_scraper.aws_batch_product_catalog_scraper.main.upsert_products",
+            "excerpt": "No file under /docs/ or *.md was changed alongside this public-API PR.",
+            "derivation": "manifest",
+            "score": 1.0
+          }
+        },
+        {
+          "id": "feature_flag_added",
+          "text": "A new feature flag was introduced. Document the kill-switch and cleanup ticket.",
+          "required": false,
+          "targets": [],
+          "auto_status": "unknown",
+          "auto_evidence": null
+        },
+        {
+          "id": "feature_flag_removed",
+          "text": "A feature flag was removed. Confirm rollout has reached 100% in all environments.",
+          "required": false,
+          "targets": [],
+          "auto_status": "unknown",
+          "auto_evidence": null
+        }
+      ]
+    }
+  ],
+  "graph_ref": "graph.json",
+  "diagnostics": [
+    {
+      "level": "warn",
+      "code": "LLM_BRIEF_HUNK_BATCH_FAILED",
+      "message": "LLM hunk-summary batch failed (offset 0).",
+      "related_node_ids": []
+    },
+    {
+      "level": "warn",
+      "code": "LLM_BRIEF_HUNK_BATCH_FAILED",
+      "message": "LLM hunk-summary batch failed (offset 8).",
+      "related_node_ids": []
+    },
+    {
+      "level": "warn",
+      "code": "LLM_BRIEF_HUNK_BATCH_FAILED",
+      "message": "LLM hunk-summary batch failed (offset 24).",
+      "related_node_ids": []
+    },
+    {
+      "level": "warn",
+      "code": "LLM_BRIEF_HEADLINE_FAILED",
+      "message": "Headline LLM call failed.",
+      "related_node_ids": []
+    },
+    {
+      "level": "warn",
+      "code": "LLM_BRIEF_PLAN_FAILED",
+      "message": "Plan-prose LLM call failed.",
+      "related_node_ids": []
+    },
+    {
+      "level": "info",
+      "code": "LLM_BRIEF_SUMMARY",
+      "message": "Filled 8 hunk insights, headline=no, plan steps 0/7.",
+      "related_node_ids": []
+    }
+  ],
+  "llm_used": true
+}

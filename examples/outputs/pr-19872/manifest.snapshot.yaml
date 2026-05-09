@@ -1,0 +1,45 @@
+schema_version: "0.1.0"
+
+# v0.1: one generic section. Predicates fire universally.
+# To add type-conditional rules later, add additional sections with `type: feat|fix|chore|...`.
+sections:
+  - rules:
+      - id: public_symbol_modified_without_test
+        text: "Public symbol changed but no test was modified or added."
+        predicate: public_symbol_modified_without_test
+        required: false
+
+      - id: external_ref_added
+        text: "PR introduces a new external dependency (DB table, HTTP route, etc.). Confirm the dependency is safe and reviewed."
+        predicate: external_ref_added
+        required: false
+
+      - id: assertion_removed
+        text: "An `assert` was removed from a test. Verify the assertion is no longer relevant."
+        predicate: assertion_removed
+        required: true
+
+      - id: broad_except_added
+        text: "Bare `except:` or `except Exception` was added. Narrow the exception unless intentional."
+        predicate: broad_except_added
+        required: false
+
+      - id: secret_like_string_added
+        text: "A high-entropy token-like literal was added. Likely a secret leak — move to env/secret manager."
+        predicate: secret_like_string_added
+        required: true
+
+      - id: no_doc_change_for_public_api
+        text: "Public API touched but no docs/*.md changed. Add or update documentation."
+        predicate: no_doc_change_for_public_api
+        required: false
+
+      - id: feature_flag_added
+        text: "A new feature flag was introduced. Document the kill-switch and cleanup ticket."
+        predicate: feature_flag_added
+        required: false
+
+      - id: feature_flag_removed
+        text: "A feature flag was removed. Confirm rollout has reached 100% in all environments."
+        predicate: feature_flag_removed
+        required: false

@@ -1,0 +1,1176 @@
+{
+  "schema_version": "0.1.0",
+  "generated_at": "2026-05-09T23:33:36.399817Z",
+  "generator": "prex 0.2.0",
+  "pr": {
+    "url": "https://github.com/connectlyai/connectly-backend/pull/19701",
+    "repo": "connectlyai/connectly-backend",
+    "number": 19701,
+    "title": "feat(knowledge): add QuestionAnswerEngine v2 and business_knowledge bot",
+    "body": null,
+    "author": "NoirKomBatman",
+    "base_ref": "NoirKomBatman/stack/18",
+    "head_ref": "NoirKomBatman/stack/19",
+    "base_sha": "d78ae621fd65a267008e2d53ad23dc6c88e4d77c",
+    "head_sha": "0a3a84e9bbbd064baac6d55d10fceadad3619dae",
+    "additions": 9752,
+    "deletions": 9,
+    "changed_files": 27
+  },
+  "review": {
+    "pr_type": "feat",
+    "pr_type_confidence": 0.95,
+    "pr_type_evidence": [
+      {
+        "kind": "external_doc",
+        "ref": "https://github.com/connectlyai/connectly-backend/pull/19701",
+        "excerpt": "title: feat(knowledge): add QuestionAnswerEngine v2 and business_knowledge bot",
+        "derivation": "heuristic",
+        "score": 0.95
+      }
+    ],
+    "risk_tier": "sensitive",
+    "risk_score": 1.0,
+    "blast_radius": {
+      "caller_files": 22,
+      "modules_crossed": 15,
+      "public_symbols_modified": 67,
+      "external_refs_added": 4
+    },
+    "novelty": {
+      "new_files": 16,
+      "new_symbols": 89,
+      "new_external_refs": 4
+    },
+    "headline": null,
+    "advisory_flags": [
+      "no_test_coverage_changed",
+      "broad_except_added",
+      "secret_like_string_added",
+      "no_docs_for_public_api"
+    ],
+    "cites": [
+      {
+        "kind": "external_doc",
+        "ref": "https://github.com/connectlyai/connectly-backend/pull/19701",
+        "excerpt": "title: feat(knowledge): add QuestionAnswerEngine v2 and business_knowledge bot",
+        "derivation": "heuristic",
+        "score": 0.95
+      }
+    ]
+  },
+  "plan": {
+    "overview": null,
+    "steps": [
+      {
+        "rank": 1,
+        "target": "hunk:python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/app.py#0",
+        "title": null,
+        "what": null,
+        "why": null,
+        "impact": null,
+        "estimated_minutes": 2,
+        "risk_signals": [
+          "sql_in_changed_lines",
+          "external_io",
+          "broad_except"
+        ],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "hunk:python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/app.py#0",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.8
+          }
+        ]
+      },
+      {
+        "rank": 2,
+        "target": "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/indexer.py#0",
+        "title": null,
+        "what": null,
+        "why": null,
+        "impact": null,
+        "estimated_minutes": 2,
+        "risk_signals": [
+          "sql_in_changed_lines",
+          "external_io",
+          "broad_except"
+        ],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/indexer.py#0",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.8
+          }
+        ]
+      },
+      {
+        "rank": 3,
+        "target": "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/qa_engine_v2.py#0",
+        "title": null,
+        "what": null,
+        "why": null,
+        "impact": null,
+        "estimated_minutes": 2,
+        "risk_signals": [
+          "sql_in_changed_lines",
+          "external_io",
+          "secret_like_string"
+        ],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/qa_engine_v2.py#0",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.8
+          }
+        ]
+      },
+      {
+        "rank": 4,
+        "target": "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.S3GetObjectClient.get_object",
+        "title": null,
+        "what": null,
+        "why": null,
+        "impact": null,
+        "estimated_minutes": 2,
+        "risk_signals": [
+          "external_io",
+          "broad_except",
+          "sql_in_changed_lines"
+        ],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.S3GetObjectClient.get_object",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.7004999999999999
+          }
+        ]
+      },
+      {
+        "rank": 5,
+        "target": "hunk:python/awslambda/faq_v2_indexer/Dockerfile#0",
+        "title": null,
+        "what": null,
+        "why": null,
+        "impact": null,
+        "estimated_minutes": 2,
+        "risk_signals": [
+          "sql_in_changed_lines",
+          "external_io"
+        ],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "hunk:python/awslambda/faq_v2_indexer/Dockerfile#0",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.7
+          }
+        ]
+      },
+      {
+        "rank": 6,
+        "target": "hunk:python/awslambda/faq_v2_indexer/uv.lock#0",
+        "title": null,
+        "what": null,
+        "why": null,
+        "impact": null,
+        "estimated_minutes": 2,
+        "risk_signals": [
+          "external_io",
+          "secret_like_string"
+        ],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "hunk:python/awslambda/faq_v2_indexer/uv.lock#0",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.7
+          }
+        ]
+      },
+      {
+        "rank": 7,
+        "target": "hunk:python/ocean_beach/ocean_beach/bots/agent_graph/business_knowledge.py#0",
+        "title": null,
+        "what": null,
+        "why": null,
+        "impact": null,
+        "estimated_minutes": 2,
+        "risk_signals": [
+          "broad_except",
+          "secret_like_string"
+        ],
+        "related_targets": [],
+        "cites": [
+          {
+            "kind": "node",
+            "ref": "hunk:python/ocean_beach/ocean_beach/bots/agent_graph/business_knowledge.py#0",
+            "excerpt": null,
+            "derivation": "ast",
+            "score": 0.7
+          }
+        ]
+      }
+    ],
+    "cites": []
+  },
+  "hunks": [
+    {
+      "hunk_id": "hunk:python/awslambda/faq_v2_indexer/.envrc#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/faq_v2_indexer/.envrc#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/.envrc#L1-L20",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/faq_v2_indexer/Dockerfile#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines",
+        "external_io"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/faq_v2_indexer/Dockerfile#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/Dockerfile#L1-L41",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/Dockerfile#L1-L41",
+          "excerpt": "FROM public.ecr.aws/lambda/python:3.10.2025.06.16.18",
+          "derivation": "ast",
+          "score": 0.9
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/Dockerfile#L1-L41",
+          "excerpt": "# Pin the base image because AWS injects botocore versions",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/app.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines",
+        "external_io",
+        "broad_except"
+      ],
+      "affects_public_symbol_ids": [
+        "symbol:python.awslambda.faq_v2_indexer.aws_lambda_faq_v2_indexer.app.handler"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/app.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/app.py#L1-L169",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/app.py#L1-L169",
+          "excerpt": "# Tenant + source IDs are extracted from the key directly — no DB roundtrip",
+          "derivation": "ast",
+          "score": 0.9
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/app.py#L1-L169",
+          "excerpt": "async with session.create_client(\"s3\") as s3_client:",
+          "derivation": "ast",
+          "score": 0.9
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/app.py#L1-L169",
+          "excerpt": "except Exception as e:",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/config.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/config.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/config.py#L1-L13",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/config.yml#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/config.yml#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/config.yml#L1-L18",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/faq_v2_indexer/config/dev.env#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/faq_v2_indexer/config/dev.env#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/config/dev.env#L1-L3",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/faq_v2_indexer/config/prod.env#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/faq_v2_indexer/config/prod.env#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/config/prod.env#L1-L3",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/faq_v2_indexer/pyproject.toml#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/faq_v2_indexer/pyproject.toml#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/pyproject.toml#L1-L37",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/awslambda/faq_v2_indexer/uv.lock#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "external_io",
+        "secret_like_string"
+      ],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/awslambda/faq_v2_indexer/uv.lock#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/uv.lock#L1-L5384",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/uv.lock#L1-L5384",
+          "excerpt": "{ name = \"botocore\" },",
+          "derivation": "ast",
+          "score": 0.9
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/awslambda/faq_v2_indexer/uv.lock#L1-L5384",
+          "excerpt": "(secret-shaped string redacted)",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/bots/agent_graph/business_knowledge.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "broad_except",
+        "secret_like_string"
+      ],
+      "affects_public_symbol_ids": [
+        "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeConfig",
+        "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeResult",
+        "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeContext",
+        "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeRetriever",
+        "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeRetriever.async_retrieve",
+        "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.QASearchEngineLike",
+        "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.QASearchEngineLike.async_search",
+        "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.QABusinessKnowledgeRetriever",
+        "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.QABusinessKnowledgeRetriever.async_retrieve",
+        "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.business_knowledge_result_from_qa_pair",
+        "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.latest_user_text",
+        "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.should_retrieve_business_knowledge",
+        "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.retrieve_business_knowledge_context",
+        "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.build_business_knowledge_context_section"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/bots/agent_graph/business_knowledge.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/bots/agent_graph/business_knowledge.py#L1-L147",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/bots/agent_graph/business_knowledge.py#L1-L147",
+          "excerpt": "except Exception:",
+          "derivation": "ast",
+          "score": 0.9
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/bots/agent_graph/business_knowledge.py#L1-L147",
+          "excerpt": "(secret-shaped string redacted)",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/__init__.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/__init__.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/qa_engines/v2/__init__.py#L1-L68",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/indexer.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines",
+        "external_io",
+        "broad_except"
+      ],
+      "affects_public_symbol_ids": [
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.IndexableKnowledgeBase",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.IndexableKnowledgeBase.async_ingest",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.IndexableKnowledgeBase.async_delete",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.DocumentParser",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.DocumentParser.async_parse_document",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.S3GetObjectClient",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.S3GetObjectClient.get_object",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.SourceRepository",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.SourceRepository.async_get_by_id",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.SourceRepository.async_transition",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.async_index_source"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/indexer.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/qa_engines/v2/indexer.py#L1-L259",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/qa_engines/v2/indexer.py#L1-L259",
+          "excerpt": "raise TransientIndexerError(f\"s3 fetch failed: {e}\") from e",
+          "derivation": "ast",
+          "score": 0.9
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/qa_engines/v2/indexer.py#L1-L259",
+          "excerpt": "async def _fetch_s3_bytes(s3_client: S3GetObjectClient, bucket: str, key: str) -> BytesIO:",
+          "derivation": "ast",
+          "score": 0.9
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/qa_engines/v2/indexer.py#L1-L259",
+          "excerpt": "except Exception as e:",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/models.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines"
+      ],
+      "affects_public_symbol_ids": [
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.SourceType",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.KnowledgeSourceStatus",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.TransientIndexerError",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.PermanentIndexerError",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.KnowledgeSource",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.KnowledgeRetrievalResult",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.SearchSummary",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.SearchKnowledgeResult",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.RawChunkHit",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.is_valid_transition",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.validate_mime_type",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.validate_file_size",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.compute_normalized_scores"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/models.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/qa_engines/v2/models.py#L1-L229",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/qa_engines/v2/models.py#L1-L229",
+          "excerpt": "# Per §4.1 state machine. Transitions to DELETED are allowed from any",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/qa_engine_v2.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines",
+        "external_io",
+        "secret_like_string"
+      ],
+      "affects_public_symbol_ids": [
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.SourceNotFound",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.DuplicateSource",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuotaExceeded",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.InvalidSourceState",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.InvalidSourceArgument",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.S3Client",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.S3Client.generate_presigned_url",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.S3Client.copy_object",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.S3Client.get_object",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.SearchableKnowledgeBase",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.SearchableKnowledgeBase.async_query_chunks",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.PresignedUploadURL",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_create_source",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_get_source",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_list_sources",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_delete_source",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_reindex_source",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_index_source",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_search"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/qa_engine_v2.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/qa_engines/v2/qa_engine_v2.py#L1-L497",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/qa_engines/v2/qa_engine_v2.py#L1-L497",
+          "excerpt": "# Source types this phase can ingest from S3. `manual_text` and `faq_pair` are",
+          "derivation": "ast",
+          "score": 0.9
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/qa_engines/v2/qa_engine_v2.py#L1-L497",
+          "excerpt": "from asyncpg import UniqueViolationError",
+          "derivation": "ast",
+          "score": 0.9
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/qa_engines/v2/qa_engine_v2.py#L1-L497",
+          "excerpt": "(secret-shaped string redacted)",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/source_repository.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [
+        "sql_in_changed_lines",
+        "external_io"
+      ],
+      "affects_public_symbol_ids": [
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.IllegalTransitionError",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_create",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_get_by_id",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_list",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_transition",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_count_since",
+        "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_soft_delete"
+      ],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/source_repository.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/qa_engines/v2/source_repository.py#L1-L320",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/qa_engines/v2/source_repository.py#L1-L320",
+          "excerpt": "INSERT INTO knowledge_sources (",
+          "derivation": "ast",
+          "score": 0.9
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/ocean_beach/ocean_beach/qa_engines/v2/source_repository.py#L1-L320",
+          "excerpt": "from asyncpg import Record",
+          "derivation": "ast",
+          "score": 0.9
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/rpc/rpc/knowledge/service.py#0",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/rpc/rpc/knowledge/service.py#0",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/rpc/rpc/knowledge/service.py#L31-L38",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/rpc/rpc/knowledge/service.py#1",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/rpc/rpc/knowledge/service.py#1",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/rpc/rpc/knowledge/service.py#L44-L50",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    },
+    {
+      "hunk_id": "hunk:python/rpc/rpc/knowledge/service.py#2",
+      "one_liner": null,
+      "intent": "unknown",
+      "risk_signals": [],
+      "affects_public_symbol_ids": [],
+      "cites": [
+        {
+          "kind": "node",
+          "ref": "hunk:python/rpc/rpc/knowledge/service.py#2",
+          "excerpt": null,
+          "derivation": "ast",
+          "score": 1.0
+        },
+        {
+          "kind": "file_line",
+          "ref": "python/rpc/rpc/knowledge/service.py#L53-L82",
+          "excerpt": null,
+          "derivation": "diff",
+          "score": 1.0
+        }
+      ],
+      "score": 1.0
+    }
+  ],
+  "checklist": [
+    {
+      "type": null,
+      "checklist_items": [
+        {
+          "id": "public_symbol_modified_without_test",
+          "text": "Public symbol changed but no test was modified or added.",
+          "required": false,
+          "targets": [
+            "symbol:python.awslambda.faq_v2_indexer.aws_lambda_faq_v2_indexer.app.handler",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeConfig",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeResult",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeContext",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeRetriever",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeRetriever.async_retrieve",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.QASearchEngineLike",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.QASearchEngineLike.async_search",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.QABusinessKnowledgeRetriever",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.QABusinessKnowledgeRetriever.async_retrieve",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.business_knowledge_result_from_qa_pair",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.latest_user_text",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.should_retrieve_business_knowledge",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.retrieve_business_knowledge_context",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.build_business_knowledge_context_section",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.IndexableKnowledgeBase",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.IndexableKnowledgeBase.async_ingest",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.IndexableKnowledgeBase.async_delete",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.DocumentParser",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.DocumentParser.async_parse_document",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.S3GetObjectClient",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.S3GetObjectClient.get_object",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.SourceRepository",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.SourceRepository.async_get_by_id",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.SourceRepository.async_transition",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.async_index_source",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.SourceType",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.KnowledgeSourceStatus",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.TransientIndexerError",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.PermanentIndexerError",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.KnowledgeSource",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.KnowledgeRetrievalResult",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.SearchSummary",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.SearchKnowledgeResult",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.RawChunkHit",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.is_valid_transition",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.validate_mime_type",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.validate_file_size",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.compute_normalized_scores",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.SourceNotFound",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.DuplicateSource",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuotaExceeded",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.InvalidSourceState",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.InvalidSourceArgument",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.S3Client",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.S3Client.generate_presigned_url",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.S3Client.copy_object",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.S3Client.get_object",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.SearchableKnowledgeBase",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.SearchableKnowledgeBase.async_query_chunks",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.PresignedUploadURL",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_create_source",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_get_source",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_list_sources",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_delete_source",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_reindex_source",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_index_source",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_search",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.IllegalTransitionError",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_create",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_get_by_id",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_list",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_transition",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_count_since",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_soft_delete"
+          ],
+          "auto_status": "fail",
+          "auto_evidence": {
+            "kind": "node",
+            "ref": "symbol:python.awslambda.faq_v2_indexer.aws_lambda_faq_v2_indexer.app.handler",
+            "excerpt": "67 public symbol(s) changed, no test symbol modified.",
+            "derivation": "manifest",
+            "score": 1.0
+          }
+        },
+        {
+          "id": "external_ref_added",
+          "text": "PR introduces a new external dependency (DB table, HTTP route, etc.). Confirm the dependency is safe and reviewed.",
+          "required": false,
+          "targets": [
+            "external_ref:db_table_pending_upload",
+            "external_ref:db_table_faq",
+            "external_ref:db_table_knowledgebaseresourcev1",
+            "external_ref:db_table_knowledge_sources"
+          ],
+          "auto_status": "fail",
+          "auto_evidence": {
+            "kind": "node",
+            "ref": "external_ref:db_table_pending_upload",
+            "excerpt": "pending_upload, faq, knowledgebaseresourcev1, knowledge_sources",
+            "derivation": "manifest",
+            "score": 1.0
+          }
+        },
+        {
+          "id": "assertion_removed",
+          "text": "An `assert` was removed from a test. Verify the assertion is no longer relevant.",
+          "required": true,
+          "targets": [],
+          "auto_status": "pass",
+          "auto_evidence": null
+        },
+        {
+          "id": "broad_except_added",
+          "text": "Bare `except:` or `except Exception` was added. Narrow the exception unless intentional.",
+          "required": false,
+          "targets": [
+            "hunk:python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/app.py#0",
+            "hunk:python/ocean_beach/ocean_beach/bots/agent_graph/business_knowledge.py#0",
+            "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/indexer.py#0"
+          ],
+          "auto_status": "fail",
+          "auto_evidence": {
+            "kind": "node",
+            "ref": "hunk:python/awslambda/faq_v2_indexer/aws_lambda_faq_v2_indexer/app.py#0",
+            "excerpt": "Bare `except:` or `except Exception` introduced.",
+            "derivation": "manifest",
+            "score": 1.0
+          }
+        },
+        {
+          "id": "secret_like_string_added",
+          "text": "A high-entropy token-like literal was added. Likely a secret leak — move to env/secret manager.",
+          "required": true,
+          "targets": [
+            "hunk:python/awslambda/faq_v2_indexer/uv.lock#0",
+            "hunk:python/ocean_beach/ocean_beach/bots/agent_graph/business_knowledge.py#0",
+            "hunk:python/ocean_beach/ocean_beach/qa_engines/v2/qa_engine_v2.py#0"
+          ],
+          "auto_status": "fail",
+          "auto_evidence": {
+            "kind": "node",
+            "ref": "hunk:python/awslambda/faq_v2_indexer/uv.lock#0",
+            "excerpt": "A high-entropy / SDK-token-shaped literal was added.",
+            "derivation": "manifest",
+            "score": 1.0
+          }
+        },
+        {
+          "id": "no_doc_change_for_public_api",
+          "text": "Public API touched but no docs/*.md changed. Add or update documentation.",
+          "required": false,
+          "targets": [
+            "symbol:python.awslambda.faq_v2_indexer.aws_lambda_faq_v2_indexer.app.handler",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeConfig",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeResult",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeContext",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeRetriever",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.BusinessKnowledgeRetriever.async_retrieve",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.QASearchEngineLike",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.QASearchEngineLike.async_search",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.QABusinessKnowledgeRetriever",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.QABusinessKnowledgeRetriever.async_retrieve",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.business_knowledge_result_from_qa_pair",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.latest_user_text",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.should_retrieve_business_knowledge",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.retrieve_business_knowledge_context",
+            "symbol:python.ocean_beach.ocean_beach.bots.agent_graph.business_knowledge.build_business_knowledge_context_section",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.IndexableKnowledgeBase",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.IndexableKnowledgeBase.async_ingest",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.IndexableKnowledgeBase.async_delete",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.DocumentParser",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.DocumentParser.async_parse_document",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.S3GetObjectClient",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.S3GetObjectClient.get_object",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.SourceRepository",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.SourceRepository.async_get_by_id",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.SourceRepository.async_transition",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.indexer.async_index_source",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.SourceType",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.KnowledgeSourceStatus",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.TransientIndexerError",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.PermanentIndexerError",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.KnowledgeSource",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.KnowledgeRetrievalResult",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.SearchSummary",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.SearchKnowledgeResult",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.RawChunkHit",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.is_valid_transition",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.validate_mime_type",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.validate_file_size",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.models.compute_normalized_scores",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.SourceNotFound",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.DuplicateSource",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuotaExceeded",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.InvalidSourceState",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.InvalidSourceArgument",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.S3Client",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.S3Client.generate_presigned_url",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.S3Client.copy_object",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.S3Client.get_object",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.SearchableKnowledgeBase",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.SearchableKnowledgeBase.async_query_chunks",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.PresignedUploadURL",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_create_source",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_get_source",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_list_sources",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_delete_source",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_reindex_source",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_index_source",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.qa_engine_v2.QuestionAnswerEngineV2.async_search",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.IllegalTransitionError",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_create",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_get_by_id",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_list",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_transition",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_count_since",
+            "symbol:python.ocean_beach.ocean_beach.qa_engines.v2.source_repository.KnowledgeSourceRepository.async_soft_delete"
+          ],
+          "auto_status": "fail",
+          "auto_evidence": {
+            "kind": "node",
+            "ref": "symbol:python.awslambda.faq_v2_indexer.aws_lambda_faq_v2_indexer.app.handler",
+            "excerpt": "No file under /docs/ or *.md was changed alongside this public-API PR.",
+            "derivation": "manifest",
+            "score": 1.0
+          }
+        },
+        {
+          "id": "feature_flag_added",
+          "text": "A new feature flag was introduced. Document the kill-switch and cleanup ticket.",
+          "required": false,
+          "targets": [],
+          "auto_status": "unknown",
+          "auto_evidence": null
+        },
+        {
+          "id": "feature_flag_removed",
+          "text": "A feature flag was removed. Confirm rollout has reached 100% in all environments.",
+          "required": false,
+          "targets": [],
+          "auto_status": "unknown",
+          "auto_evidence": null
+        }
+      ]
+    }
+  ],
+  "graph_ref": "graph.json",
+  "diagnostics": [
+    {
+      "level": "warn",
+      "code": "LLM_BRIEF_HUNK_BATCH_FAILED",
+      "message": "LLM hunk-summary batch failed (offset 0).",
+      "related_node_ids": []
+    },
+    {
+      "level": "warn",
+      "code": "LLM_BRIEF_HUNK_PARSE_FAILED",
+      "message": "Could not parse hunk-summary response (offset 8).",
+      "related_node_ids": []
+    },
+    {
+      "level": "warn",
+      "code": "LLM_BRIEF_HUNK_BATCH_FAILED",
+      "message": "LLM hunk-summary batch failed (offset 16).",
+      "related_node_ids": []
+    },
+    {
+      "level": "warn",
+      "code": "LLM_BRIEF_HEADLINE_FAILED",
+      "message": "Headline LLM call failed.",
+      "related_node_ids": []
+    },
+    {
+      "level": "info",
+      "code": "LLM_BRIEF_SUMMARY",
+      "message": "Filled 0 hunk insights, headline=no, plan steps 0/7.",
+      "related_node_ids": []
+    }
+  ],
+  "llm_used": false
+}
