@@ -1,0 +1,86 @@
+{
+  "schema_version": "0.1.0",
+  "generated_at": "2026-05-09T22:00:00Z",
+  "generator": "prex 0.1.0",
+  "pr": {
+    "url": "https://github.com/test/repo/pull/1",
+    "repo": "test/repo",
+    "number": 1,
+    "title": "Add strict bounds check",
+    "author": "d",
+    "base_ref": "main",
+    "head_ref": "feat/bounds",
+    "base_sha": "abcdef1",
+    "head_sha": "1234567",
+    "additions": 10,
+    "deletions": 5,
+    "changed_files": 2
+  },
+  "nodes": [
+    {
+      "id": "module:src/core",
+      "kind": "module",
+      "change_state": "unchanged",
+      "name": "src.core",
+      "path": "src/core"
+    },
+    {
+      "id": "file:src/core/utils.ts",
+      "kind": "file",
+      "change_state": "modified",
+      "path": "src/core/utils.ts",
+      "language": "typescript"
+    },
+    {
+      "id": "symbol:function:calculateBounds",
+      "kind": "symbol",
+      "change_state": "modified",
+      "symbol_kind": "function",
+      "name": "calculateBounds",
+      "qualified_name": "src.core.utils.calculateBounds",
+      "file_id": "file:src/core/utils.ts",
+      "line_range": { "start": 10, "end": 25 },
+      "public": true
+    },
+    {
+      "id": "hunk:src/core/utils.ts:15-20",
+      "kind": "hunk",
+      "change_state": "added",
+      "file_id": "file:src/core/utils.ts",
+      "line_range": { "start": 15, "end": 20 },
+      "change_type": "added",
+      "patch": "@@ -15,0 +16,5 @@\n+  if (val > max) {\n+    throw new Error('OOB');\n+  }"
+    },
+    {
+      "id": "symbol:function:legacyCheck",
+      "kind": "symbol",
+      "change_state": "removed",
+      "symbol_kind": "function",
+      "name": "legacyCheck",
+      "qualified_name": "src.core.utils.legacyCheck",
+      "file_id": "file:src/core/utils.ts",
+      "line_range": { "start": 100, "end": 105 }
+    }
+  ],
+  "edges": [
+    {
+      "id": "contains:module:src/core->file:src/core/utils.ts",
+      "type": "contains",
+      "source_id": "module:src/core",
+      "target_id": "file:src/core/utils.ts"
+    },
+    {
+      "id": "contains:file:src/core/utils.ts->symbol:function:calculateBounds",
+      "type": "contains",
+      "source_id": "file:src/core/utils.ts",
+      "target_id": "symbol:function:calculateBounds"
+    },
+    {
+      "id": "touches:hunk:src/core/utils.ts:15-20->symbol:function:calculateBounds",
+      "type": "touches",
+      "source_id": "hunk:src/core/utils.ts:15-20",
+      "target_id": "symbol:function:calculateBounds",
+      "change_state": "added"
+    }
+  ]
+}

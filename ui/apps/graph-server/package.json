@@ -1,0 +1,12 @@
+{
+  "name": "graph-server",
+  "version": "1.0.0",
+  "description": "Minimal ingestion server to serve graph JSON payload",
+  "main": "index.ts",
+  "scripts": {
+    "start": "bun run index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
