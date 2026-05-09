@@ -19,6 +19,10 @@ from typing import Optional
 
 import click
 
+import shutil
+
+from prex.manifest import find_manifest
+from prex.manifest.contract_renderer import write_contract
 from prex.parser import parse_pr
 from prex.parser._brief import build_brief
 from prex.parser._brief_llm import enrich_brief_with_llm
@@ -66,6 +70,14 @@ def review(
         brief = enrich_brief_with_llm(graph, brief, diagnostics=brief.diagnostics)
     brief_path = out / "brief.json"
     brief_path.write_text(brief.model_dump_json(indent=2) + "\n")
+
+    # Snapshot the resolved manifest (target repo or bundled default).
+    manifest_resolved = find_manifest(repo_path=Path("."), override=manifest_p)
+    if manifest_resolved is not None:
+        shutil.copyfile(manifest_resolved, out / "manifest.snapshot.yaml")
+
+    # Auto-render the consumer-facing contract.
+    write_contract(out / "CONTRACT.md", graph.pr)
 
     if debug_mermaid:
         (out / "graph.mmd").write_text(to_mermaid(graph) + "\n")

@@ -1,0 +1,797 @@
+{
+  "$defs": {
+    "BlastRadius": {
+      "additionalProperties": false,
+      "description": "Counters that quantify outward impact of the PR.",
+      "properties": {
+        "caller_files": {
+          "description": "Distinct files calling/referencing changed symbols.",
+          "minimum": 0,
+          "title": "Caller Files",
+          "type": "integer"
+        },
+        "modules_crossed": {
+          "description": "Distinct modules containing any caller.",
+          "minimum": 0,
+          "title": "Modules Crossed",
+          "type": "integer"
+        },
+        "public_symbols_modified": {
+          "description": "# of public-flagged Symbols touched.",
+          "minimum": 0,
+          "title": "Public Symbols Modified",
+          "type": "integer"
+        },
+        "external_refs_added": {
+          "description": "# of newly-added ExternalRef nodes.",
+          "minimum": 0,
+          "title": "External Refs Added",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "caller_files",
+        "modules_crossed",
+        "public_symbols_modified",
+        "external_refs_added"
+      ],
+      "title": "BlastRadius",
+      "type": "object"
+    },
+    "ChecklistBinding": {
+      "additionalProperties": false,
+      "description": "A grouping of checklist items, optionally scoped to a PR type.",
+      "properties": {
+        "type": {
+          "anyOf": [
+            {
+              "enum": [
+                "feat",
+                "fix",
+                "chore",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "When set, items apply only to PRs of this type. None = generic.",
+          "title": "Type"
+        },
+        "checklist_items": {
+          "items": {
+            "$ref": "#/$defs/ChecklistItem"
+          },
+          "title": "Checklist Items",
+          "type": "array"
+        }
+      },
+      "title": "ChecklistBinding",
+      "type": "object"
+    },
+    "ChecklistItem": {
+      "additionalProperties": false,
+      "description": "One review check, bound to specific targets in the graph.",
+      "properties": {
+        "id": {
+          "description": "Stable id (e.g. 'public_symbol_modified_without_test').",
+          "title": "Id",
+          "type": "string"
+        },
+        "text": {
+          "description": "Human-readable text rendered in the UI.",
+          "title": "Text",
+          "type": "string"
+        },
+        "required": {
+          "default": false,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "targets": {
+          "description": "Hunk or symbol node ids this item applies to.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Targets",
+          "type": "array"
+        },
+        "auto_status": {
+          "anyOf": [
+            {
+              "enum": [
+                "pass",
+                "fail",
+                "unknown"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Auto-evaluated status when the predicate runs deterministically.",
+          "title": "Auto Status"
+        },
+        "auto_evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Citation"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "id",
+        "text"
+      ],
+      "title": "ChecklistItem",
+      "type": "object"
+    },
+    "Citation": {
+      "additionalProperties": false,
+      "description": "Universal provenance primitive.\n\nEvery prose field in PREx output (headlines, one-liners, plan rationales)\ncarries one or more `Citation` items. The host LLM is expected to render\na fact only via its citation; an unsourced claim is a validation error.",
+      "properties": {
+        "kind": {
+          "description": "Resolution mode for `ref`: 'node' or 'edge' = id in graph.json; 'file_line' = '<path>#L<start>-L<end>' at pr.head_sha; 'external_doc' = absolute URL.",
+          "enum": [
+            "node",
+            "edge",
+            "file_line",
+            "external_doc"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "ref": {
+          "description": "Reference identifier. Format depends on `kind`.",
+          "title": "Ref",
+          "type": "string"
+        },
+        "excerpt": {
+          "anyOf": [
+            {
+              "maxLength": 240,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional \u2264120-char literal quote of the cited evidence.",
+          "title": "Excerpt"
+        },
+        "derivation": {
+          "$ref": "#/$defs/Derivation",
+          "description": "How the claim being cited was produced."
+        },
+        "score": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional 0..1 trust score for the claim. Use for visual weighting.",
+          "title": "Score"
+        }
+      },
+      "required": [
+        "kind",
+        "ref",
+        "derivation"
+      ],
+      "title": "Citation",
+      "type": "object"
+    },
+    "Derivation": {
+      "description": "How a fact in the output was produced.\n\nMaps directly to a render tag the host LLM can show next to any claim.",
+      "enum": [
+        "ast",
+        "diff",
+        "crossref_text",
+        "llm",
+        "manifest",
+        "heuristic"
+      ],
+      "title": "Derivation",
+      "type": "string"
+    },
+    "Diagnostic": {
+      "additionalProperties": false,
+      "description": "Non-fatal warning emitted during graph or brief construction.\n\nUsed to surface static-analysis misses, ambiguity, schema invariant\nviolations, and LLM enrichment failures. Reviewer-visible at `level`\n>= 'warn'; `info` is plumbing.",
+      "properties": {
+        "level": {
+          "description": "Severity.",
+          "enum": [
+            "info",
+            "warn",
+            "error"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "code": {
+          "description": "Stable identifier (e.g. 'INVARIANT_ORPHAN_EDGE').",
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "related_node_ids": {
+          "description": "Node IDs this diagnostic refers to. Empty for global diagnostics.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Related Node Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "level",
+        "code",
+        "message"
+      ],
+      "title": "Diagnostic",
+      "type": "object"
+    },
+    "HunkInsight": {
+      "additionalProperties": false,
+      "description": "Per-hunk semantic anchor.\n\n`risk_signals` is AST-derived (deterministic). `one_liner` and `intent`\nare filled by the LLM only when --llm-summarise is set.",
+      "properties": {
+        "hunk_id": {
+          "description": "ID of the HunkNode this insight describes.",
+          "title": "Hunk Id",
+          "type": "string"
+        },
+        "one_liner": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "\u226480-char human description. LLM-filled iff --llm-summarise.",
+          "title": "One Liner"
+        },
+        "intent": {
+          "default": "unknown",
+          "description": "High-level intent classification.",
+          "enum": [
+            "adds_capability",
+            "fixes_bug",
+            "renames",
+            "extracts",
+            "inlines",
+            "reorders",
+            "tightens_types",
+            "weakens_test",
+            "adds_test",
+            "removes_dead",
+            "comments_only",
+            "style_only",
+            "unknown"
+          ],
+          "title": "Intent",
+          "type": "string"
+        },
+        "risk_signals": {
+          "description": "AST-derived risk markers found in the hunk's added/removed lines.",
+          "items": {
+            "enum": [
+              "auth_or_authz_touched",
+              "sql_in_changed_lines",
+              "external_io",
+              "removes_assertion",
+              "weakens_validation",
+              "raises_swallowed",
+              "broad_except",
+              "feature_flag_added",
+              "feature_flag_removed",
+              "secret_like_string",
+              "numeric_constant_changed_in_hot_loop"
+            ],
+            "type": "string"
+          },
+          "title": "Risk Signals",
+          "type": "array"
+        },
+        "affects_public_symbol_ids": {
+          "description": "Symbol node ids the hunk modifies/defines that are marked public.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Affects Public Symbol Ids",
+          "type": "array"
+        },
+        "cites": {
+          "description": "Citations grounding the insight. At least one required when one_liner is set.",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "title": "Cites",
+          "type": "array"
+        },
+        "score": {
+          "default": 1.0,
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        }
+      },
+      "required": [
+        "hunk_id"
+      ],
+      "title": "HunkInsight",
+      "type": "object"
+    },
+    "Novelty": {
+      "additionalProperties": false,
+      "description": "Counters that quantify what's new vs touched.",
+      "properties": {
+        "new_files": {
+          "minimum": 0,
+          "title": "New Files",
+          "type": "integer"
+        },
+        "new_symbols": {
+          "minimum": 0,
+          "title": "New Symbols",
+          "type": "integer"
+        },
+        "new_external_refs": {
+          "minimum": 0,
+          "title": "New External Refs",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "new_files",
+        "new_symbols",
+        "new_external_refs"
+      ],
+      "title": "Novelty",
+      "type": "object"
+    },
+    "PRMetadata": {
+      "additionalProperties": false,
+      "description": "Identifying info for the PR the graph was built from.\n\nCaptures everything needed to reproduce the parse: repo, base/head SHAs,\nbranch names, plus surface metadata for UI display. The full PR `body`\nis preserved here so the briefing layer can extract author intent.",
+      "properties": {
+        "url": {
+          "description": "Canonical PR URL.",
+          "title": "Url",
+          "type": "string"
+        },
+        "repo": {
+          "description": "Owner/name slug.",
+          "title": "Repo",
+          "type": "string"
+        },
+        "number": {
+          "minimum": 1,
+          "title": "Number",
+          "type": "integer"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "body": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Full PR body / description as fetched from the host. Used for intent extraction.",
+          "title": "Body"
+        },
+        "author": {
+          "title": "Author",
+          "type": "string"
+        },
+        "base_ref": {
+          "title": "Base Ref",
+          "type": "string"
+        },
+        "head_ref": {
+          "title": "Head Ref",
+          "type": "string"
+        },
+        "base_sha": {
+          "minLength": 7,
+          "title": "Base Sha",
+          "type": "string"
+        },
+        "head_sha": {
+          "minLength": 7,
+          "title": "Head Sha",
+          "type": "string"
+        },
+        "additions": {
+          "minimum": 0,
+          "title": "Additions",
+          "type": "integer"
+        },
+        "deletions": {
+          "minimum": 0,
+          "title": "Deletions",
+          "type": "integer"
+        },
+        "changed_files": {
+          "minimum": 0,
+          "title": "Changed Files",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "url",
+        "repo",
+        "number",
+        "title",
+        "author",
+        "base_ref",
+        "head_ref",
+        "base_sha",
+        "head_sha",
+        "additions",
+        "deletions",
+        "changed_files"
+      ],
+      "title": "PRMetadata",
+      "type": "object"
+    },
+    "ReviewBrief": {
+      "additionalProperties": false,
+      "description": "PR-level hero block. One block, one component group.",
+      "properties": {
+        "pr_type": {
+          "enum": [
+            "feat",
+            "fix",
+            "chore",
+            "unknown"
+          ],
+          "title": "Pr Type",
+          "type": "string"
+        },
+        "pr_type_confidence": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Pr Type Confidence",
+          "type": "number"
+        },
+        "pr_type_evidence": {
+          "description": "Evidence supporting `pr_type`: title prefix, glob match, etc.",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "title": "Pr Type Evidence",
+          "type": "array"
+        },
+        "risk_tier": {
+          "enum": [
+            "trivial",
+            "standard",
+            "sensitive"
+          ],
+          "title": "Risk Tier",
+          "type": "string"
+        },
+        "risk_score": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Risk Score",
+          "type": "number"
+        },
+        "blast_radius": {
+          "$ref": "#/$defs/BlastRadius"
+        },
+        "novelty": {
+          "$ref": "#/$defs/Novelty"
+        },
+        "headline": {
+          "anyOf": [
+            {
+              "maxLength": 200,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "\u2264140-char human-readable summary. LLM-filled iff --llm-summarise.",
+          "title": "Headline"
+        },
+        "advisory_flags": {
+          "items": {
+            "enum": [
+              "scope_creep_5plus_areas",
+              "test_lines_removed",
+              "generated_files_only",
+              "secret_like_string_added",
+              "no_test_coverage_changed",
+              "ai_authorship_undisclosed",
+              "no_docs_for_public_api",
+              "removes_assertion",
+              "broad_except_added"
+            ],
+            "type": "string"
+          },
+          "title": "Advisory Flags",
+          "type": "array"
+        },
+        "cites": {
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "title": "Cites",
+          "type": "array"
+        }
+      },
+      "required": [
+        "pr_type",
+        "pr_type_confidence",
+        "risk_tier",
+        "risk_score",
+        "blast_radius",
+        "novelty"
+      ],
+      "title": "ReviewBrief",
+      "type": "object"
+    },
+    "ReviewPlan": {
+      "additionalProperties": false,
+      "description": "The guided navigation through the PR.\n\nOne block, one component group on the host. Triple-framed (What/Why/Impact)\nso the host LLM can map each part to a distinct UI affordance.",
+      "properties": {
+        "overview": {
+          "anyOf": [
+            {
+              "maxLength": 600,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "\u22643 sentences tying the steps together as a navigation through-line.",
+          "title": "Overview"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/ReviewStep"
+          },
+          "title": "Steps",
+          "type": "array"
+        },
+        "cites": {
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "title": "Cites",
+          "type": "array"
+        }
+      },
+      "title": "ReviewPlan",
+      "type": "object"
+    },
+    "ReviewStep": {
+      "additionalProperties": false,
+      "description": "One step in the suggested review path.\n\n`what` / `why` / `impact` are LLM-filled iff --llm-summarise. The\ndeterministic fields (rank, target, risk_signals, cites) are always\npopulated by the ranking algorithm.",
+      "properties": {
+        "rank": {
+          "description": "1-indexed; lower = read first.",
+          "minimum": 1,
+          "title": "Rank",
+          "type": "integer"
+        },
+        "target": {
+          "description": "Primary node id (hunk or symbol) anchoring this step.",
+          "title": "Target",
+          "type": "string"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "maxLength": 120,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "\u226460-char label of what the step covers.",
+          "title": "Title"
+        },
+        "what": {
+          "anyOf": [
+            {
+              "maxLength": 600,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "\u22642 sentences. The objective change in plain language.",
+          "title": "What"
+        },
+        "why": {
+          "anyOf": [
+            {
+              "maxLength": 600,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "\u22642 sentences. Ties to author intent (PR title/body) + pr_type.",
+          "title": "Why"
+        },
+        "impact": {
+          "anyOf": [
+            {
+              "maxLength": 600,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "\u22642 sentences. Quotes blast_radius numbers + downstream callers.",
+          "title": "Impact"
+        },
+        "estimated_minutes": {
+          "default": 2,
+          "maximum": 60,
+          "minimum": 1,
+          "title": "Estimated Minutes",
+          "type": "integer"
+        },
+        "risk_signals": {
+          "items": {
+            "enum": [
+              "auth_or_authz_touched",
+              "sql_in_changed_lines",
+              "external_io",
+              "removes_assertion",
+              "weakens_validation",
+              "raises_swallowed",
+              "broad_except",
+              "feature_flag_added",
+              "feature_flag_removed",
+              "secret_like_string",
+              "numeric_constant_changed_in_hot_loop"
+            ],
+            "type": "string"
+          },
+          "title": "Risk Signals",
+          "type": "array"
+        },
+        "related_targets": {
+          "description": "Secondary node ids the reviewer should glance at while on this step.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Related Targets",
+          "type": "array"
+        },
+        "cites": {
+          "description": "Citations grounding the step. Each prose field must cite at least one node/edge/file_line.",
+          "items": {
+            "$ref": "#/$defs/Citation"
+          },
+          "title": "Cites",
+          "type": "array"
+        }
+      },
+      "required": [
+        "rank",
+        "target"
+      ],
+      "title": "ReviewStep",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Briefing for the generative-UI host LLM.\n\nSibling of `Graph`. Host LLM consumes `brief.json` first; reaches into\n`graph.json` only when following a citation.",
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0",
+      "default": "0.1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "generator": {
+      "title": "Generator",
+      "type": "string"
+    },
+    "pr": {
+      "$ref": "#/$defs/PRMetadata"
+    },
+    "review": {
+      "$ref": "#/$defs/ReviewBrief"
+    },
+    "plan": {
+      "$ref": "#/$defs/ReviewPlan"
+    },
+    "hunks": {
+      "items": {
+        "$ref": "#/$defs/HunkInsight"
+      },
+      "title": "Hunks",
+      "type": "array"
+    },
+    "checklist": {
+      "items": {
+        "$ref": "#/$defs/ChecklistBinding"
+      },
+      "title": "Checklist",
+      "type": "array"
+    },
+    "graph_ref": {
+      "description": "Relative path to the sibling graph.json artifact.",
+      "title": "Graph Ref",
+      "type": "string"
+    },
+    "diagnostics": {
+      "items": {
+        "$ref": "#/$defs/Diagnostic"
+      },
+      "title": "Diagnostics",
+      "type": "array"
+    },
+    "llm_used": {
+      "default": false,
+      "description": "True iff at least one prose field was filled by an LLM call.",
+      "title": "Llm Used",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "generated_at",
+    "generator",
+    "pr",
+    "review",
+    "plan",
+    "graph_ref"
+  ],
+  "title": "Brief",
+  "type": "object"
+}

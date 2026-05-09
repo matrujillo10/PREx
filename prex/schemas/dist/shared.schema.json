@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PREx shared primitives",
+  "description": "Models reused across graph.json and brief.json.",
+  "$defs": {
+    "LineRange": {
+      "additionalProperties": false,
+      "description": "Inclusive 1-indexed line range in a file at a given SHA.",
+      "properties": {
+        "start": {
+          "description": "1-indexed start line.",
+          "minimum": 1,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "description": "1-indexed end line, inclusive of `start`.",
+          "minimum": 1,
+          "title": "End",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "LineRange",
+      "type": "object"
+    },
+    "Citation": {
+      "$defs": {
+        "Derivation": {
+          "description": "How a fact in the output was produced.\n\nMaps directly to a render tag the host LLM can show next to any claim.",
+          "enum": [
+            "ast",
+            "diff",
+            "crossref_text",
+            "llm",
+            "manifest",
+            "heuristic"
+          ],
+          "title": "Derivation",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "description": "Universal provenance primitive.\n\nEvery prose field in PREx output (headlines, one-liners, plan rationales)\ncarries one or more `Citation` items. The host LLM is expected to render\na fact only via its citation; an unsourced claim is a validation error.",
+      "properties": {
+        "kind": {
+          "description": "Resolution mode for `ref`: 'node' or 'edge' = id in graph.json; 'file_line' = '<path>#L<start>-L<end>' at pr.head_sha; 'external_doc' = absolute URL.",
+          "enum": [
+            "node",
+            "edge",
+            "file_line",
+            "external_doc"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "ref": {
+          "description": "Reference identifier. Format depends on `kind`.",
+          "title": "Ref",
+          "type": "string"
+        },
+        "excerpt": {
+          "anyOf": [
+            {
+              "maxLength": 240,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional \u2264120-char literal quote of the cited evidence.",
+          "title": "Excerpt"
+        },
+        "derivation": {
+          "$ref": "#/$defs/Derivation",
+          "description": "How the claim being cited was produced."
+        },
+        "score": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional 0..1 trust score for the claim. Use for visual weighting.",
+          "title": "Score"
+        }
+      },
+      "required": [
+        "kind",
+        "ref",
+        "derivation"
+      ],
+      "title": "Citation",
+      "type": "object"
+    },
+    "Diagnostic": {
+      "additionalProperties": false,
+      "description": "Non-fatal warning emitted during graph or brief construction.\n\nUsed to surface static-analysis misses, ambiguity, schema invariant\nviolations, and LLM enrichment failures. Reviewer-visible at `level`\n>= 'warn'; `info` is plumbing.",
+      "properties": {
+        "level": {
+          "description": "Severity.",
+          "enum": [
+            "info",
+            "warn",
+            "error"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "code": {
+          "description": "Stable identifier (e.g. 'INVARIANT_ORPHAN_EDGE').",
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "related_node_ids": {
+          "description": "Node IDs this diagnostic refers to. Empty for global diagnostics.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Related Node Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "level",
+        "code",
+        "message"
+      ],
+      "title": "Diagnostic",
+      "type": "object"
+    }
+  }
+}
