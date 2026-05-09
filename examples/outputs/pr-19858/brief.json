@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1.0",
-  "generated_at": "2026-05-09T23:32:23.530525Z",
+  "generated_at": "2026-05-09T23:42:52.088474Z",
   "generator": "prex 0.2.0",
   "pr": {
     "url": "https://github.com/connectlyai/connectly-backend/pull/19858",
@@ -42,7 +42,7 @@
       "new_symbols": 0,
       "new_external_refs": 2
     },
-    "headline": "Adds CSAT score filtering and mapping to agent evaluation, modifying 5 public symbols in a sensitive change without new tests or docs.",
+    "headline": "Implements CSAT score filtering and mapping for agent evaluation, a sensitive feature modifying 5 public symbols and 3 caller files.",
     "advisory_flags": [
       "no_test_coverage_changed",
       "no_docs_for_public_api"
@@ -58,7 +58,7 @@
       {
         "kind": "external_doc",
         "ref": "https://github.com/connectlyai/connectly-backend/pull/19858",
-        "excerpt": "Adds CSAT score filtering and mapping to agent evaluation, modifying 5 public symbols in a sensitive change without new ",
+        "excerpt": "Implements CSAT score filtering and mapping for agent evaluation, a sensitive feature modifying 5 public symbols and 3 c",
         "derivation": "llm",
         "score": 0.85
       }
@@ -629,8 +629,8 @@
     },
     {
       "hunk_id": "hunk:idl/models/agent_evaluation/dto/dto.proto#0",
-      "one_liner": null,
-      "intent": "unknown",
+      "one_liner": "Adds `min_csat_score` field to `EvaluatedSessionsFilter` proto message.",
+      "intent": "adds_capability",
       "risk_signals": [],
       "affects_public_symbol_ids": [],
       "cites": [
@@ -647,14 +647,21 @@
           "excerpt": null,
           "derivation": "diff",
           "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:idl/models/agent_evaluation/dto/dto.proto#0",
+          "excerpt": "Adds `min_csat_score` field to `EvaluatedSessionsFilter` proto message.",
+          "derivation": "llm",
+          "score": 0.85
         }
       ],
       "score": 1.0
     },
     {
       "hunk_id": "hunk:idl/models/agent_evaluation/dto/dto.proto#1",
-      "one_liner": null,
-      "intent": "unknown",
+      "one_liner": "Adds `csat_score` and `failed_eval_names` fields to `EvaluatedSessionEntry` proto.",
+      "intent": "adds_capability",
       "risk_signals": [],
       "affects_public_symbol_ids": [],
       "cites": [
@@ -671,14 +678,21 @@
           "excerpt": null,
           "derivation": "diff",
           "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:idl/models/agent_evaluation/dto/dto.proto#1",
+          "excerpt": "Adds `csat_score` and `failed_eval_names` fields to `EvaluatedSessionEntry` proto.",
+          "derivation": "llm",
+          "score": 0.85
         }
       ],
       "score": 1.0
     },
     {
       "hunk_id": "hunk:python/agent_evaluation/agent_evaluation/controller/controller.py#0",
-      "one_liner": null,
-      "intent": "unknown",
+      "one_liner": "Passes `failed_eval_names` from query result to `EvaluatedSessionEntry` constructor.",
+      "intent": "adds_capability",
       "risk_signals": [],
       "affects_public_symbol_ids": [
         "symbol:python.agent_evaluation.agent_evaluation.controller.controller.AgentEvaluationController",
@@ -698,14 +712,21 @@
           "excerpt": null,
           "derivation": "diff",
           "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:python/agent_evaluation/agent_evaluation/controller/controller.py#0",
+          "excerpt": "Passes `failed_eval_names` from query result to `EvaluatedSessionEntry` constructor.",
+          "derivation": "llm",
+          "score": 0.85
         }
       ],
       "score": 1.0
     },
     {
       "hunk_id": "hunk:python/agent_evaluation/agent_evaluation/controller/controller.py#1",
-      "one_liner": null,
-      "intent": "unknown",
+      "one_liner": "Passes `csat_score` from query result to `EvaluatedSessionEntry` constructor.",
+      "intent": "adds_capability",
       "risk_signals": [],
       "affects_public_symbol_ids": [
         "symbol:python.agent_evaluation.agent_evaluation.controller.controller.AgentEvaluationController",
@@ -725,14 +746,21 @@
           "excerpt": null,
           "derivation": "diff",
           "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:python/agent_evaluation/agent_evaluation/controller/controller.py#1",
+          "excerpt": "Passes `csat_score` from query result to `EvaluatedSessionEntry` constructor.",
+          "derivation": "llm",
+          "score": 0.85
         }
       ],
       "score": 1.0
     },
     {
       "hunk_id": "hunk:python/agent_evaluation/agent_evaluation/mappers/mappers.py#0",
-      "one_liner": null,
-      "intent": "unknown",
+      "one_liner": "Maps `min_csat_score` from proto filter to model filter.",
+      "intent": "adds_capability",
       "risk_signals": [],
       "affects_public_symbol_ids": [],
       "cites": [
@@ -749,14 +777,21 @@
           "excerpt": null,
           "derivation": "diff",
           "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:python/agent_evaluation/agent_evaluation/mappers/mappers.py#0",
+          "excerpt": "Maps `min_csat_score` from proto filter to model filter.",
+          "derivation": "llm",
+          "score": 0.85
         }
       ],
       "score": 1.0
     },
     {
       "hunk_id": "hunk:python/agent_evaluation/agent_evaluation/mappers/mappers.py#1",
-      "one_liner": null,
-      "intent": "unknown",
+      "one_liner": "Maps `failed_eval_names` from internal model to DTO.",
+      "intent": "adds_capability",
       "risk_signals": [],
       "affects_public_symbol_ids": [
         "symbol:python.agent_evaluation.agent_evaluation.mappers.mappers.map_query_evaluated_sessions_response"
@@ -775,14 +810,21 @@
           "excerpt": null,
           "derivation": "diff",
           "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:python/agent_evaluation/agent_evaluation/mappers/mappers.py#1",
+          "excerpt": "Maps `failed_eval_names` from internal model to DTO.",
+          "derivation": "llm",
+          "score": 0.85
         }
       ],
       "score": 1.0
     },
     {
       "hunk_id": "hunk:python/agent_evaluation/agent_evaluation/mappers/mappers.py#2",
-      "one_liner": null,
-      "intent": "unknown",
+      "one_liner": "Maps `csat_score` from internal model to DTO.",
+      "intent": "adds_capability",
       "risk_signals": [],
       "affects_public_symbol_ids": [
         "symbol:python.agent_evaluation.agent_evaluation.mappers.mappers.map_query_evaluated_sessions_response"
@@ -801,14 +843,21 @@
           "excerpt": null,
           "derivation": "diff",
           "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:python/agent_evaluation/agent_evaluation/mappers/mappers.py#2",
+          "excerpt": "Maps `csat_score` from internal model to DTO.",
+          "derivation": "llm",
+          "score": 0.85
         }
       ],
       "score": 1.0
     },
     {
       "hunk_id": "hunk:python/agent_evaluation/agent_evaluation/models/models.py#0",
-      "one_liner": null,
-      "intent": "unknown",
+      "one_liner": "Adds `min_csat_score` field to `EvaluatedSessionsFilter` model.",
+      "intent": "adds_capability",
       "risk_signals": [],
       "affects_public_symbol_ids": [
         "symbol:python.agent_evaluation.agent_evaluation.models.models.EvaluatedSessionsFilter"
@@ -827,6 +876,13 @@
           "excerpt": null,
           "derivation": "diff",
           "score": 1.0
+        },
+        {
+          "kind": "node",
+          "ref": "hunk:python/agent_evaluation/agent_evaluation/models/models.py#0",
+          "excerpt": "Adds `min_csat_score` field to `EvaluatedSessionsFilter` model.",
+          "derivation": "llm",
+          "score": 0.85
         }
       ],
       "score": 1.0
@@ -1074,7 +1130,7 @@
     },
     {
       "hunk_id": "hunk:python/agent_evaluation/agent_evaluation/repository/repository.py#6",
-      "one_liner": "Adds failed_eval_names and csat_score to the evaluated sessions query.",
+      "one_liner": "Adds `failed_eval_names` and `csat_score` to the evaluated sessions query.",
       "intent": "adds_capability",
       "risk_signals": [],
       "affects_public_symbol_ids": [
@@ -1099,7 +1155,7 @@
         {
           "kind": "node",
           "ref": "hunk:python/agent_evaluation/agent_evaluation/repository/repository.py#6",
-          "excerpt": "Adds failed_eval_names and csat_score to the evaluated sessions query.",
+          "excerpt": "Adds `failed_eval_names` and `csat_score` to the evaluated sessions query.",
           "derivation": "llm",
           "score": 0.85
         }
@@ -1216,12 +1272,6 @@
     {
       "level": "warn",
       "code": "LLM_BRIEF_HUNK_BATCH_FAILED",
-      "message": "LLM hunk-summary batch failed (offset 0).",
-      "related_node_ids": []
-    },
-    {
-      "level": "warn",
-      "code": "LLM_BRIEF_HUNK_BATCH_FAILED",
       "message": "LLM hunk-summary batch failed (offset 8).",
       "related_node_ids": []
     },
@@ -1234,7 +1284,7 @@
     {
       "level": "info",
       "code": "LLM_BRIEF_SUMMARY",
-      "message": "Filled 1 hunk insights, headline=yes, plan steps 0/7.",
+      "message": "Filled 9 hunk insights, headline=yes, plan steps 0/7.",
       "related_node_ids": []
     }
   ],
