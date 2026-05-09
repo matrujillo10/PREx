@@ -529,7 +529,10 @@ def parse_pr(
 
         # If no enclosing symbol, the source is the file itself (typical for module-level imports)
         edge_source = source_sym_id or file_node_id_by_path[caller_file]
-        edge_id = _node_id(cr.edge_type.value, f"{edge_source}->{target_node_id}:{cr.source_file}:{cr.line}")
+        edge_id = _node_id(cr.edge_type.value, f"{edge_source}->{target_node_id}@{cr.source_file}@{cr.line}")
+        # Store file:line in note suffix so enrichment can read the call site without re-parsing.
+        suffix = f"[at {cr.source_file}:{cr.line}]"
+        full_note = f"{note} {suffix}".strip() if note else suffix
         edges.append(
             Edge(
                 id=edge_id,
@@ -537,7 +540,7 @@ def parse_pr(
                 source_id=edge_source,
                 target_id=target_node_id,
                 confidence=confidence,
-                note=note,
+                note=full_note,
             )
         )
 
@@ -563,6 +566,39 @@ def parse_pr(
     # 7. LLM enrichment (optional) ------------------------------------------
     llm_used = False
     if llm_enrich:
+        # 7a. Disambiguate AMBIGUOUS cross-ref edges via call-site reading.
+        nodes_by_id = {n.id: n for n in nodes}
+        target_signatures_by_id = {
+            n.id: getattr(n, "signature", None) or ""
+            for n in nodes
+            if getattr(n, "kind", None) == NodeKind.SYMBOL
+        }
+        # Build other-def-sites map: bare name -> list of qualified names that aren't changed targets.
+        same_name_other_def_sites: Dict[str, List[str]] = {}
+        for bs in built_symbols_by_qn.values():
+            same_name_other_def_sites.setdefault(bs.extracted.name, []).append(bs.extracted.qualified_name)
+        for bs in extra_symbols.values():
+            same_name_other_def_sites.setdefault(bs.extracted.name, []).append(bs.extracted.qualified_name)
+
+        edges, kept, dropped, unsure = _enrich.disambiguate_method_callers(
+            enrichment_input=_enrich.EnrichmentInput(repo=pr_meta.repo),
+            repo_path=repo_path,
+            edges=edges,
+            nodes_by_id=nodes_by_id,
+            target_signatures_by_id=target_signatures_by_id,
+            same_name_other_def_sites=same_name_other_def_sites,
+            diagnostics=diagnostics,
+        )
+        if kept or dropped or unsure:
+            diagnostics.append(
+                Diagnostic(
+                    level="info",
+                    code="LLM_ENRICH_AMBIGUOUS_RESOLVED",
+                    message=f"LLM disambiguation: kept {kept}, dropped {dropped}, unsure {unsure}.",
+                )
+            )
+
+        # 7b. Zero-caller pass (still stub).
         zero_caller_pubs = []
         edges_by_target: Dict[str, List[Edge]] = {}
         for e in edges:
@@ -589,7 +625,7 @@ def parse_pr(
             diagnostics=diagnostics,
         )
         edges.extend(new_edges)
-        llm_used = any(e.confidence == Confidence.LLM_INFERRED for e in edges)
+        llm_used = llm_enrich and (kept > 0 or dropped > 0 or unsure > 0 or any(e.confidence == Confidence.LLM_INFERRED for e in edges))
 
     # 8. Build Graph + invariant validation ---------------------------------
     graph = Graph(

@@ -8,7 +8,8 @@ dependencies = [
   "tree-sitter>=0.23,<0.26",
   "tree-sitter-python>=0.23,<0.26",
   "click>=8.1",
-  "anthropic>=0.40",
+  "litellm>=1.50",
+  "google-cloud-aiplatform>=1.60",
 ]
 
 [project.scripts]
