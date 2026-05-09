@@ -1,0 +1,22 @@
+[project]
+name = "prex"
+version = "0.1.0"
+description = "PR review reimagined: diff impact graph generator"
+requires-python = ">=3.10"
+dependencies = [
+  "pydantic>=2.6,<3",
+  "tree-sitter>=0.23,<0.26",
+  "tree-sitter-python>=0.23,<0.26",
+  "click>=8.1",
+  "anthropic>=0.40",
+]
+
+[project.scripts]
+prex = "prex.cli:main"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["prex*"]

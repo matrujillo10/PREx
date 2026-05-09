@@ -1,0 +1,663 @@
+{
+  "$defs": {
+    "ChangeState": {
+      "description": "Node-level diff overlay.\n\nComputed by overlaying the unified diff on the AST: a node is `added` if it\nappears only at head_sha, `removed` if only at base_sha, `modified` if any\nhunk overlaps its line range, otherwise `unchanged`.",
+      "enum": [
+        "unchanged",
+        "added",
+        "modified",
+        "removed"
+      ],
+      "title": "ChangeState",
+      "type": "string"
+    },
+    "Confidence": {
+      "description": "Provenance / certainty of the node or edge.\n\n`exact`        \u2014 derived directly from tree-sitter AST or stack-graphs/SCIP semantic resolution.\n`ambiguous`    \u2014 multiple candidates resolved by name; pick is heuristic. UI should badge.\n`llm_inferred` \u2014 produced by --llm-enrich. UI must badge distinctly; not authoritative.",
+      "enum": [
+        "exact",
+        "ambiguous",
+        "llm_inferred"
+      ],
+      "title": "Confidence",
+      "type": "string"
+    },
+    "Diagnostic": {
+      "additionalProperties": false,
+      "description": "Non-fatal warning emitted during graph construction.\n\nUsed to surface stack-graphs misses, ripgrep ambiguities, schema invariant\nviolations, and any LLM enrichment failures. Reviewer-visible.",
+      "properties": {
+        "level": {
+          "description": "Severity of the diagnostic.",
+          "enum": [
+            "info",
+            "warn",
+            "error"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "code": {
+          "description": "Stable identifier (e.g. 'STACK_GRAPHS_NO_CALLERS', 'INVARIANT_ORPHAN_EDGE').",
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "description": "Human-readable description.",
+          "title": "Message",
+          "type": "string"
+        },
+        "related_node_ids": {
+          "description": "Node IDs this diagnostic refers to. Empty for global diagnostics.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Related Node Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "level",
+        "code",
+        "message"
+      ],
+      "title": "Diagnostic",
+      "type": "object"
+    },
+    "Edge": {
+      "additionalProperties": false,
+      "description": "Typed directed edge between two nodes.\n\nAllowed source/target kind combinations are constrained by `EdgeType` semantics\n(see EdgeType docstring). The Graph-level invariant check enforces them at emit.",
+      "properties": {
+        "id": {
+          "description": "Globally unique edge id. Format: '<type>:<source_id>->-<target_id>'.",
+          "title": "Id",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/EdgeType",
+          "description": "Edge type."
+        },
+        "source_id": {
+          "description": "ID of the source node.",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "target_id": {
+          "description": "ID of the target node.",
+          "title": "Target Id",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence",
+          "default": "exact",
+          "description": "Provenance of this edge (resolver determines)."
+        },
+        "change_state": {
+          "$ref": "#/$defs/ChangeState",
+          "default": "unchanged",
+          "description": "Edge-level diff overlay. An edge is `added` if it exists only at head_sha, `removed` if only at base_sha, `unchanged` otherwise."
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-text annotation. Especially used for llm_inferred edges to record reasoning.",
+          "title": "Note"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "source_id",
+        "target_id"
+      ],
+      "title": "Edge",
+      "type": "object"
+    },
+    "EdgeType": {
+      "description": "Typed, directed edge.\n\nAllowed source/target kinds per type:\n    contains:    Module->File, File->Symbol, File->Hunk\n    defines:     Hunk->Symbol  (this hunk creates or modifies the symbol's signature)\n    touches:     Hunk->Symbol  (this hunk overlaps body, no signature change)\n    calls:       Symbol->Symbol\n    references:  Symbol->Symbol  (non-call: type usage, identifier read, attribute access)\n    imports:     File->Symbol or File->Module\n    covers:      Symbol(symbol_kind=test)->Symbol\n    external:    Symbol->ExternalRef",
+      "enum": [
+        "contains",
+        "defines",
+        "touches",
+        "calls",
+        "references",
+        "imports",
+        "covers",
+        "external"
+      ],
+      "title": "EdgeType",
+      "type": "string"
+    },
+    "ExternalRefKind": {
+      "description": "Category of an external (out-of-repo) reference.\n\nUsed for things the call graph cannot resolve symbolically because they live\noutside the codebase (database, network) but are still load-bearing for review.",
+      "enum": [
+        "db_table",
+        "http_route",
+        "grpc_method",
+        "package",
+        "other"
+      ],
+      "title": "ExternalRefKind",
+      "type": "string"
+    },
+    "ExternalRefNode": {
+      "additionalProperties": false,
+      "description": "A reference to a resource outside the codebase (DB table, HTTP route, etc.).",
+      "properties": {
+        "id": {
+          "description": "Globally unique within this graph. Format: '<kind>:<stable-key>'.",
+          "title": "Id",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence",
+          "default": "exact",
+          "description": "How certain the resolver is about this node's existence/identity."
+        },
+        "change_state": {
+          "$ref": "#/$defs/ChangeState",
+          "default": "unchanged",
+          "description": "Diff overlay state of this node."
+        },
+        "kind": {
+          "const": "external_ref",
+          "default": "external_ref",
+          "description": "Discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "ref_kind": {
+          "$ref": "#/$defs/ExternalRefKind",
+          "description": "Category of external resource."
+        },
+        "name": {
+          "description": "Canonical name. Examples: 'ticket_associations' (db_table), 'POST /v1/sessions' (http_route), 'agent_evaluation.v1.QueryEvaluatedSessions' (grpc_method).",
+          "title": "Name",
+          "type": "string"
+        },
+        "detail": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional structured detail. For db_table: JSON path or column expression used. For http_route: handler module. Free-form.",
+          "title": "Detail"
+        }
+      },
+      "required": [
+        "id",
+        "ref_kind",
+        "name"
+      ],
+      "title": "ExternalRefNode",
+      "type": "object"
+    },
+    "FileNode": {
+      "additionalProperties": false,
+      "description": "A source file at head_sha (or base_sha if removed).",
+      "properties": {
+        "id": {
+          "description": "Globally unique within this graph. Format: '<kind>:<stable-key>'.",
+          "title": "Id",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence",
+          "default": "exact",
+          "description": "How certain the resolver is about this node's existence/identity."
+        },
+        "change_state": {
+          "$ref": "#/$defs/ChangeState",
+          "default": "unchanged",
+          "description": "Diff overlay state of this node."
+        },
+        "kind": {
+          "const": "file",
+          "default": "file",
+          "description": "Discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "path": {
+          "description": "Repo-relative file path.",
+          "title": "Path",
+          "type": "string"
+        },
+        "language": {
+          "description": "tree-sitter grammar name, e.g. 'python', 'typescript', 'sql', 'proto'.",
+          "title": "Language",
+          "type": "string"
+        },
+        "generated": {
+          "default": false,
+          "description": "True if classified as generated/codegen (proto-gen, openapi, lockfile, snapshot). Generated files should be collapsed in UIs by default.",
+          "title": "Generated",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "path",
+        "language"
+      ],
+      "title": "FileNode",
+      "type": "object"
+    },
+    "HunkChangeType": {
+      "description": "Hunk-level diff direction. A hunk is the smallest atomic edit unit in a unified diff.",
+      "enum": [
+        "added",
+        "modified",
+        "removed"
+      ],
+      "title": "HunkChangeType",
+      "type": "string"
+    },
+    "HunkNode": {
+      "additionalProperties": false,
+      "description": "A contiguous diff region within a single file. The atomic unit of change.",
+      "properties": {
+        "id": {
+          "description": "Globally unique within this graph. Format: '<kind>:<stable-key>'.",
+          "title": "Id",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence",
+          "default": "exact",
+          "description": "How certain the resolver is about this node's existence/identity."
+        },
+        "change_state": {
+          "$ref": "#/$defs/ChangeState",
+          "default": "unchanged",
+          "description": "Diff overlay state of this node."
+        },
+        "kind": {
+          "const": "hunk",
+          "default": "hunk",
+          "description": "Discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "file_id": {
+          "description": "ID of the FileNode this hunk lives in.",
+          "title": "File Id",
+          "type": "string"
+        },
+        "line_range": {
+          "$ref": "#/$defs/LineRange",
+          "description": "Lines at head_sha (or base_sha for removed-only hunks)."
+        },
+        "change_type": {
+          "$ref": "#/$defs/HunkChangeType",
+          "description": "Whether the hunk is added/modified/removed."
+        },
+        "patch": {
+          "description": "Unified-diff fragment for this hunk: '@@' header plus +/-/' ' lines.",
+          "title": "Patch",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "file_id",
+        "line_range",
+        "change_type",
+        "patch"
+      ],
+      "title": "HunkNode",
+      "type": "object"
+    },
+    "LineRange": {
+      "additionalProperties": false,
+      "description": "Inclusive 1-indexed line range in a file at a given SHA.",
+      "properties": {
+        "start": {
+          "description": "1-indexed start line.",
+          "minimum": 1,
+          "title": "Start",
+          "type": "integer"
+        },
+        "end": {
+          "description": "1-indexed end line, inclusive of `start`.",
+          "minimum": 1,
+          "title": "End",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "LineRange",
+      "type": "object"
+    },
+    "ModuleNode": {
+      "additionalProperties": false,
+      "description": "A logical module \u2014 a directory containing source files belonging to one unit.",
+      "properties": {
+        "id": {
+          "description": "Globally unique within this graph. Format: '<kind>:<stable-key>'.",
+          "title": "Id",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence",
+          "default": "exact",
+          "description": "How certain the resolver is about this node's existence/identity."
+        },
+        "change_state": {
+          "$ref": "#/$defs/ChangeState",
+          "default": "unchanged",
+          "description": "Diff overlay state of this node."
+        },
+        "kind": {
+          "const": "module",
+          "default": "module",
+          "description": "Discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "name": {
+          "description": "Dotted or path-shaped module identifier (e.g. 'agent_evaluation').",
+          "title": "Name",
+          "type": "string"
+        },
+        "path": {
+          "description": "Repo-relative directory path of the module root.",
+          "title": "Path",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "path"
+      ],
+      "title": "ModuleNode",
+      "type": "object"
+    },
+    "PRMetadata": {
+      "additionalProperties": false,
+      "description": "Identifying info for the PR the graph was built from.\n\nCaptures everything needed to reproduce the parse: repo, base/head SHAs,\nbranch names, plus surface metadata for UI display.",
+      "properties": {
+        "url": {
+          "description": "Canonical PR URL (e.g. https://github.com/<org>/<repo>/pull/<n>).",
+          "title": "Url",
+          "type": "string"
+        },
+        "repo": {
+          "description": "Owner/name slug, e.g. 'connectlyai/connectly-backend'.",
+          "title": "Repo",
+          "type": "string"
+        },
+        "number": {
+          "description": "PR number within the repo.",
+          "minimum": 1,
+          "title": "Number",
+          "type": "integer"
+        },
+        "title": {
+          "description": "PR title at fetch time.",
+          "title": "Title",
+          "type": "string"
+        },
+        "author": {
+          "description": "Login of PR author.",
+          "title": "Author",
+          "type": "string"
+        },
+        "base_ref": {
+          "description": "Base branch name (usually 'main').",
+          "title": "Base Ref",
+          "type": "string"
+        },
+        "head_ref": {
+          "description": "Head branch name.",
+          "title": "Head Ref",
+          "type": "string"
+        },
+        "base_sha": {
+          "description": "Commit SHA of the base.",
+          "minLength": 7,
+          "title": "Base Sha",
+          "type": "string"
+        },
+        "head_sha": {
+          "description": "Commit SHA of the head.",
+          "minLength": 7,
+          "title": "Head Sha",
+          "type": "string"
+        },
+        "additions": {
+          "description": "Total lines added across all files.",
+          "minimum": 0,
+          "title": "Additions",
+          "type": "integer"
+        },
+        "deletions": {
+          "description": "Total lines removed across all files.",
+          "minimum": 0,
+          "title": "Deletions",
+          "type": "integer"
+        },
+        "changed_files": {
+          "description": "Total file count touched by the PR.",
+          "minimum": 0,
+          "title": "Changed Files",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "url",
+        "repo",
+        "number",
+        "title",
+        "author",
+        "base_ref",
+        "head_ref",
+        "base_sha",
+        "head_sha",
+        "additions",
+        "deletions",
+        "changed_files"
+      ],
+      "title": "PRMetadata",
+      "type": "object"
+    },
+    "SymbolKind": {
+      "description": "Sub-kind of a Symbol node. The reviewer-visible classification of a definition.",
+      "enum": [
+        "function",
+        "method",
+        "class",
+        "type",
+        "const",
+        "test"
+      ],
+      "title": "SymbolKind",
+      "type": "string"
+    },
+    "SymbolNode": {
+      "additionalProperties": false,
+      "description": "A named, addressable definition: function, method, class, type, const, or test.",
+      "properties": {
+        "id": {
+          "description": "Globally unique within this graph. Format: '<kind>:<stable-key>'.",
+          "title": "Id",
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "#/$defs/Confidence",
+          "default": "exact",
+          "description": "How certain the resolver is about this node's existence/identity."
+        },
+        "change_state": {
+          "$ref": "#/$defs/ChangeState",
+          "default": "unchanged",
+          "description": "Diff overlay state of this node."
+        },
+        "kind": {
+          "const": "symbol",
+          "default": "symbol",
+          "description": "Discriminator.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "symbol_kind": {
+          "$ref": "#/$defs/SymbolKind",
+          "description": "Sub-classification of the symbol."
+        },
+        "name": {
+          "description": "Local name without path (e.g. 'query_evaluated_sessions').",
+          "title": "Name",
+          "type": "string"
+        },
+        "qualified_name": {
+          "description": "Module-rooted dotted name. Example: 'agent_evaluation.controller.controller.query_evaluated_sessions'.",
+          "title": "Qualified Name",
+          "type": "string"
+        },
+        "file_id": {
+          "description": "ID of the FileNode containing this symbol.",
+          "title": "File Id",
+          "type": "string"
+        },
+        "line_range": {
+          "$ref": "#/$defs/LineRange",
+          "description": "Lines in head_sha where the symbol's definition lives (or base_sha if removed)."
+        },
+        "signature": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "One-line signature when extractable (e.g. 'def foo(a: int) -> str:').",
+          "title": "Signature"
+        },
+        "public": {
+          "default": false,
+          "description": "Heuristic: not '_'-prefixed; in __all__; appears in proto/openapi/IDL; or referenced from outside its declaring module.",
+          "title": "Public",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "symbol_kind",
+        "name",
+        "qualified_name",
+        "file_id",
+        "line_range"
+      ],
+      "title": "SymbolNode",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Complete impact graph for one PR. Versioned root document.\n\nBackwards-compatibility: bump `schema_version` on any breaking change.\nDownstream consumers should pin to a major version range.",
+  "properties": {
+    "schema_version": {
+      "const": "0.1.0",
+      "default": "0.1.0",
+      "description": "Semantic version of this schema. Bump on breaking change.",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "generated_at": {
+      "description": "UTC timestamp when the graph was emitted.",
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "generator": {
+      "description": "Tool name + version, e.g. 'prex 0.1.0'.",
+      "title": "Generator",
+      "type": "string"
+    },
+    "pr": {
+      "$ref": "#/$defs/PRMetadata",
+      "description": "Identifying info for the PR."
+    },
+    "nodes": {
+      "description": "Heterogeneous node list, discriminated by 'kind'.",
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "external_ref": "#/$defs/ExternalRefNode",
+            "file": "#/$defs/FileNode",
+            "hunk": "#/$defs/HunkNode",
+            "module": "#/$defs/ModuleNode",
+            "symbol": "#/$defs/SymbolNode"
+          },
+          "propertyName": "kind"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/ModuleNode"
+          },
+          {
+            "$ref": "#/$defs/FileNode"
+          },
+          {
+            "$ref": "#/$defs/SymbolNode"
+          },
+          {
+            "$ref": "#/$defs/HunkNode"
+          },
+          {
+            "$ref": "#/$defs/ExternalRefNode"
+          }
+        ]
+      },
+      "title": "Nodes",
+      "type": "array"
+    },
+    "edges": {
+      "description": "All edges in the graph.",
+      "items": {
+        "$ref": "#/$defs/Edge"
+      },
+      "title": "Edges",
+      "type": "array"
+    },
+    "diagnostics": {
+      "description": "Non-fatal warnings emitted during construction.",
+      "items": {
+        "$ref": "#/$defs/Diagnostic"
+      },
+      "title": "Diagnostics",
+      "type": "array"
+    },
+    "llm_enrichment_used": {
+      "default": false,
+      "description": "True iff at least one node/edge has confidence=llm_inferred.",
+      "title": "Llm Enrichment Used",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "generated_at",
+    "generator",
+    "pr",
+    "nodes",
+    "edges"
+  ],
+  "title": "Graph",
+  "type": "object"
+}
