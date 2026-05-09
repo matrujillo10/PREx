@@ -152,6 +152,10 @@ def parse_pr(
         rel_path = fd.path
         if not rel_path:
             continue
+        # Skip test files entirely when --no-include-tests; we don't want their
+        # added/modified symbols, hunks, or external refs in the graph either.
+        if not include_tests and _stackgraphs.is_test_path(rel_path):
+            continue
         lang = _language_of(rel_path)
         generated = _is_generated(rel_path)
 

@@ -52,8 +52,29 @@ _TEST_DIR_HINTS = ("/tests/", "/test/")
 _TEST_FILE_PREFIXES = ("test_",)
 _TEST_FILE_SUFFIXES = ("_test.py", "_test.ts", "_test.js")
 
+# Names that are too common across Python repos to be useful as cross-ref targets.
+# A function called `main` in a changed file resolves to every `main()` in the repo.
+COMMON_ENTRYPOINT_NAMES = {
+    "main", "handler", "app", "run", "setup", "factory", "wrapper", "decorator",
+    "init", "deps", "cli", "fn", "func", "callback", "process", "execute",
+    "start", "stop", "close", "open", "read", "write", "send", "receive",
+    "load", "save", "get", "set", "update", "delete", "create", "build",
+    "wrap", "make", "new", "from_dict", "to_dict", "parse", "format",
+    "__init__", "__call__", "__str__", "__repr__",
+}
 
-def _is_test_path(rel_or_abs: str) -> bool:
+# A name resolved by stack-graphs/text-search where the same name has more than this many
+# definition sites repo-wide is considered too ambiguous to emit as a per-edge signal.
+# Methods like `async_upsert` defined in 5+ classes produce wrong edges with high confidence
+# because text search cannot distinguish receiver types.
+MAX_REPO_DEFINITION_SITES = 2
+
+# When a name has this many or more definition sites repo-wide, downgrade emitted edges
+# to AMBIGUOUS confidence even if only one of those sites is in the changed-target set.
+AMBIGUOUS_DEFINITION_SITES = 2
+
+
+def is_test_path(rel_or_abs: str) -> bool:
     """Heuristic: file lives in a tests/ dir OR matches a test-naming convention."""
     p = rel_or_abs.replace("\\", "/")
     if any(h in f"/{p.strip('/')}/" for h in _TEST_DIR_HINTS):
@@ -180,6 +201,11 @@ def find_cross_refs(
     suffixes = {("." + g.split(".")[-1]) for g in file_globs if "." in g}
     files = _walk_files(repo_path, suffixes)
 
+    # Build a lightweight global definition-count by name across non-test files
+    # so we can skip names that appear as definitions everywhere ("main", "handler",
+    # plus repo-specific common methods like "async_upsert").
+    def_count_by_name = _count_definition_sites(files, by_name.keys(), include_tests=include_tests)
+
     for name, sym_list in by_name.items():
         # Skip dunder names — too noisy.
         if name.startswith("__") and name.endswith("__"):
@@ -187,13 +213,20 @@ def find_cross_refs(
         # Skip very short or very common names — too many false positives.
         if len(name) < 4:
             continue
+        if name in COMMON_ENTRYPOINT_NAMES:
+            continue
+        if def_count_by_name.get(name, 0) > MAX_REPO_DEFINITION_SITES:
+            continue
         hits = _search_term_in_files(files, name)
         seen: set[Tuple[str, int]] = set()
+        # Dedup: at most one edge per (source_file, target_qualname) so generated
+        # stubs that register a name many times produce one edge instead of many.
+        seen_file_target: set[Tuple[str, str]] = set()
         for abs_file, lineno, line_text in hits:
             rel_path = _rel(abs_file, repo_path)
             if rel_path in excluded:
                 continue
-            if not include_tests and _is_test_path(rel_path):
+            if not include_tests and is_test_path(rel_path):
                 continue
             # Skip the actual definition site of any of the candidates
             if any(s.start_line == lineno and rel_path.endswith(_qn_to_filename_hint(s.qualified_name)) for s in sym_list):
@@ -201,9 +234,23 @@ def find_cross_refs(
             if (rel_path, lineno) in seen:
                 continue
             seen.add((rel_path, lineno))
+            # File-level dedup: only first edge from a given source file to this target name.
+            target_key = sym_list[0].qualified_name if len(sym_list) == 1 else f"~{name}"
+            if (rel_path, target_key) in seen_file_target:
+                continue
+            seen_file_target.add((rel_path, target_key))
+            # Even a uniquely-changed-target name can be ambiguous if other places in the
+            # repo define the same name. Downgrade confidence accordingly.
+            repo_defs = def_count_by_name.get(name, 0)
+            if len(sym_list) == 1 and repo_defs >= AMBIGUOUS_DEFINITION_SITES:
+                resolved_confidence = Confidence.AMBIGUOUS
+            elif len(sym_list) == 1:
+                resolved_confidence = Confidence.EXACT
+            else:
+                resolved_confidence = Confidence.AMBIGUOUS
             edge_type = _classify_edge(line_text, name)
             enclosing, _all_syms = _enclosing_symbol(repo_path, rel_path, lineno)
-            confidence = Confidence.EXACT if len(sym_list) == 1 else Confidence.AMBIGUOUS
+            confidence = resolved_confidence
             target_qn = sym_list[0].qualified_name if len(sym_list) == 1 else None
             out.append(
                 CrossRef(
@@ -217,6 +264,38 @@ def find_cross_refs(
                 )
             )
     return out
+
+
+_DEF_RE_TEMPLATE = re.compile(r"^\s*(?:async\s+)?(?:def|class)\s+(\w+)\s*[\(:]")
+
+
+def _count_definition_sites(files: List[Path], names: Iterable[str], *, include_tests: bool) -> Dict[str, int]:
+    """For each name in `names`, count distinct files where it appears as `def name` or `class name`.
+
+    Conservative: scan each file once, regex over lines. Skips test files when not including tests.
+    """
+    name_set = set(names)
+    if not name_set:
+        return {}
+    counts: Dict[str, int] = {n: 0 for n in name_set}
+    for f in files:
+        rel = str(f)
+        if not include_tests and is_test_path(rel):
+            continue
+        try:
+            text = f.read_text(encoding="utf-8", errors="replace")
+        except Exception:
+            continue
+        seen_in_file: set[str] = set()
+        for line in text.splitlines():
+            m = _DEF_RE_TEMPLATE.match(line)
+            if not m:
+                continue
+            n = m.group(1)
+            if n in name_set and n not in seen_in_file:
+                counts[n] += 1
+                seen_in_file.add(n)
+    return counts
 
 
 def _qn_to_filename_hint(qualname: str) -> str:

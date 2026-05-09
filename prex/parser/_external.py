@@ -35,6 +35,16 @@ _RESERVED = {
     "lateral", "values", "returning", "set", "using", "true", "false", "null",
     "distinct", "all", "any", "exists", "in", "is", "like", "between", "with",
     "left", "right", "inner", "outer", "full", "cross", "natural", "concat",
+    # English stopwords that occasionally appear after FROM/JOIN/INTO in comments or natural-language strings.
+    "the", "this", "that", "these", "those", "an", "another", "such", "same",
+    "above", "below", "each", "every", "some", "any", "all", "none",
+    "inside", "outside", "earlier", "later", "before", "after", "while",
+    "here", "there", "it", "them", "us", "we", "you", "they",
+    "both", "either", "neither", "any", "all", "one", "two",
+    "now", "then", "today", "yesterday", "tomorrow",
+    "only", "just", "very", "much", "many", "few",
+    # Common lexical filler in natural-language / variable docs.
+    "data", "info", "result", "results", "value", "values",
 }
 
 
@@ -63,6 +73,9 @@ def find_sql_refs(source: str) -> List[SQLRef]:
         if stripped.startswith(("from ", "import ")):
             if "select" not in line.lower() and "join" not in line.lower():
                 continue
+        # Skip comment lines (Python `#`, SQL `--`, C-style `//`).
+        if stripped.startswith(("#", "--", "//")):
+            continue
         for m in _SQL_RE.finditer(line):
             name = m.group("name").lower()
             if name in _RESERVED:
