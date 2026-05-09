@@ -109,6 +109,7 @@ def parse_pr(
     *,
     llm_enrich: bool = False,
     work_dir: Optional[Path] = None,
+    include_tests: bool = False,
 ) -> Graph:
     """Resolve a PR, parse the diff, build the impact graph.
 
@@ -117,6 +118,10 @@ def parse_pr(
         llm_enrich: When True, run LLM enrichment for zero-caller public symbols
                     and other ambiguous resolutions. Requires ANTHROPIC_API_KEY.
         work_dir: Local clone cache root. Defaults to ~/.cache/prex/repos.
+        include_tests: When False (default), drop test-file callers from the
+                       graph. Tests reliably cite the changed code; their
+                       presence is the test-gap signal but rendering each one
+                       creates noise. When True, include them as caller nodes.
 
     Returns:
         A complete `Graph` with nodes, edges, diagnostics, and PRMetadata.
@@ -412,6 +417,7 @@ def parse_pr(
             target_symbols,
             file_globs=("*.py",),
             exclude_paths=changed_python_files,  # exclude same-file (we already have intra-file edges via hunk overlap)
+            include_tests=include_tests,
         )
 
     # 5. Materialise caller nodes + edges from cross-refs --------------------

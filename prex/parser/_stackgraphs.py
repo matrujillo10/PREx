@@ -48,6 +48,22 @@ class CrossRef:
 
 
 _SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build", ".tox", ".mypy_cache", ".pytest_cache"}
+_TEST_DIR_HINTS = ("/tests/", "/test/")
+_TEST_FILE_PREFIXES = ("test_",)
+_TEST_FILE_SUFFIXES = ("_test.py", "_test.ts", "_test.js")
+
+
+def _is_test_path(rel_or_abs: str) -> bool:
+    """Heuristic: file lives in a tests/ dir OR matches a test-naming convention."""
+    p = rel_or_abs.replace("\\", "/")
+    if any(h in f"/{p.strip('/')}/" for h in _TEST_DIR_HINTS):
+        return True
+    name = p.rsplit("/", 1)[-1]
+    if any(name.startswith(pref) for pref in _TEST_FILE_PREFIXES):
+        return True
+    if any(name.endswith(suf) for suf in _TEST_FILE_SUFFIXES):
+        return True
+    return False
 
 
 def have_ripgrep() -> bool:
@@ -136,6 +152,7 @@ def find_cross_refs(
     *,
     file_globs: Iterable[str] = ("*.py",),
     exclude_paths: Iterable[str] = (),
+    include_tests: bool = False,
 ) -> List[CrossRef]:
     """Find references to each target symbol across the repo.
 
@@ -145,6 +162,9 @@ def find_cross_refs(
         file_globs: ripgrep -g patterns to scope the search.
         exclude_paths: repo-relative paths to skip (e.g. the file the symbol lives in,
                        to avoid self-loops on definition lines).
+        include_tests: when False (default), drop hits from test files. Tests are
+                       almost always callers of the changed code; they create
+                       graph noise without adding signal beyond a count.
 
     Returns:
         List of CrossRef. AMBIGUOUS confidence when target name resolves to >1 known target.
@@ -172,6 +192,8 @@ def find_cross_refs(
         for abs_file, lineno, line_text in hits:
             rel_path = _rel(abs_file, repo_path)
             if rel_path in excluded:
+                continue
+            if not include_tests and _is_test_path(rel_path):
                 continue
             # Skip the actual definition site of any of the candidates
             if any(s.start_line == lineno and rel_path.endswith(_qn_to_filename_hint(s.qualified_name)) for s in sym_list):

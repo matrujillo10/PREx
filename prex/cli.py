@@ -28,11 +28,12 @@ def main() -> None:
 @click.option("--out", "out_path", default="output/graph.json", show_default=True, help="Path to write graph JSON.")
 @click.option("--mermaid", "mermaid_path", default="output/graph.mmd", show_default=True, help="Path to write Mermaid view.")
 @click.option("--llm-enrich/--no-llm-enrich", default=False, help="Enable LLM enrichment for ambiguous edges + zero-caller public symbols. Requires ANTHROPIC_API_KEY.")
+@click.option("--include-tests/--no-include-tests", default=False, help="Include test-file callers as graph nodes. Default off; tests are noisy as graph nodes.")
 @click.option("--work-dir", default=None, type=click.Path(), help="Local clone cache root. Defaults to ~/.cache/prex/repos.")
-def review(pr_url: str, out_path: str, mermaid_path: str, llm_enrich: bool, work_dir: Optional[str]) -> None:
+def review(pr_url: str, out_path: str, mermaid_path: str, llm_enrich: bool, include_tests: bool, work_dir: Optional[str]) -> None:
     """Build the impact graph for a PR."""
     work = Path(work_dir).expanduser() if work_dir else None
-    graph = parse_pr(pr_url, llm_enrich=llm_enrich, work_dir=work)
+    graph = parse_pr(pr_url, llm_enrich=llm_enrich, work_dir=work, include_tests=include_tests)
 
     out = Path(out_path)
     mer = Path(mermaid_path)
