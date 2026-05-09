@@ -10,3 +10,7 @@ dist/
 graph.json
 graph.mmd
 .cache/
+
+# generated graph outputs
+output/*
+!output/.gitkeep

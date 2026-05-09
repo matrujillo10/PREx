@@ -25,8 +25,8 @@ def main() -> None:
 
 @main.command()
 @click.argument("pr_url")
-@click.option("--out", "out_path", default="graph.json", show_default=True, help="Path to write graph JSON.")
-@click.option("--mermaid", "mermaid_path", default="graph.mmd", show_default=True, help="Path to write Mermaid view.")
+@click.option("--out", "out_path", default="output/graph.json", show_default=True, help="Path to write graph JSON.")
+@click.option("--mermaid", "mermaid_path", default="output/graph.mmd", show_default=True, help="Path to write Mermaid view.")
 @click.option("--llm-enrich/--no-llm-enrich", default=False, help="Enable LLM enrichment for ambiguous edges + zero-caller public symbols. Requires ANTHROPIC_API_KEY.")
 @click.option("--work-dir", default=None, type=click.Path(), help="Local clone cache root. Defaults to ~/.cache/prex/repos.")
 def review(pr_url: str, out_path: str, mermaid_path: str, llm_enrich: bool, work_dir: Optional[str]) -> None:
@@ -34,8 +34,12 @@ def review(pr_url: str, out_path: str, mermaid_path: str, llm_enrich: bool, work
     work = Path(work_dir).expanduser() if work_dir else None
     graph = parse_pr(pr_url, llm_enrich=llm_enrich, work_dir=work)
 
-    Path(out_path).write_text(to_json(graph) + "\n")
-    Path(mermaid_path).write_text(to_mermaid(graph) + "\n")
+    out = Path(out_path)
+    mer = Path(mermaid_path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    mer.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(to_json(graph) + "\n")
+    mer.write_text(to_mermaid(graph) + "\n")
 
     n_changed_syms = sum(1 for n in graph.nodes if getattr(n, "kind", None) == "symbol" and n.change_state != "unchanged")
     n_callers = sum(1 for e in graph.edges if e.type.value in ("calls", "references", "imports"))
