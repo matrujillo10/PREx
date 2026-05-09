@@ -11,10 +11,15 @@ from typing import Dict, Iterable, List, Optional, Set, Tuple
 from prex.parser import _diff, _enrich, _external, _pr, _stackgraphs, _treesitter
 from prex.parser._stackgraphs import CrossRef
 from prex.parser._treesitter import ExtractedSymbol
-from prex.schemas.graph import (
+from prex.schemas._shared import (
     ChangeState,
-    Confidence,
+    Citation,
+    Derivation,
     Diagnostic,
+    LineRange,
+)
+from prex.schemas.graph import (
+    CallerStub,
     Edge,
     EdgeType,
     ExternalRefKind,
@@ -23,7 +28,6 @@ from prex.schemas.graph import (
     Graph,
     HunkChangeType,
     HunkNode,
-    LineRange,
     ModuleNode,
     NodeKind,
     PRMetadata,
@@ -435,14 +439,16 @@ def parse_pr(
             if not candidates:
                 continue
             target_node_id = candidates[0].node_id
-            confidence = Confidence.AMBIGUOUS
+            edge_derivation = Derivation.HEURISTIC
+            edge_score = 0.4
             note = f"Ambiguous: {len(candidates)} candidates with name {cr.target_name}."
         else:
             bs = built_symbols_by_qn.get(cr.target_qualname)
             if bs is None:
                 continue
             target_node_id = bs.node_id
-            confidence = cr.confidence
+            edge_derivation = cr.derivation
+            edge_score = cr.score
             note = None
 
         # Caller file
@@ -496,17 +502,13 @@ def parse_pr(
                             enclosing_sym = s
                             break
                 if enclosing_sym is not None:
-                    sym_id = _node_id("symbol", enclosing_sym.qualified_name)
+                    sym_id = _node_id("caller_stub", enclosing_sym.qualified_name)
                     nodes.append(
-                        SymbolNode(
+                        CallerStub(
                             id=sym_id,
-                            symbol_kind=SymbolKind(enclosing_sym.kind),
-                            name=enclosing_sym.name,
                             qualified_name=enclosing_sym.qualified_name,
                             file_id=file_id,
-                            line_range=LineRange(start=enclosing_sym.start_line, end=enclosing_sym.end_line),
-                            signature=enclosing_sym.signature,
-                            public=enclosing_sym.public,
+                            symbol_kind=SymbolKind(enclosing_sym.kind),
                             change_state=ChangeState.UNCHANGED,
                         )
                     )
@@ -530,17 +532,23 @@ def parse_pr(
         # If no enclosing symbol, the source is the file itself (typical for module-level imports)
         edge_source = source_sym_id or file_node_id_by_path[caller_file]
         edge_id = _node_id(cr.edge_type.value, f"{edge_source}->{target_node_id}@{cr.source_file}@{cr.line}")
-        # Store file:line in note suffix so enrichment can read the call site without re-parsing.
-        suffix = f"[at {cr.source_file}:{cr.line}]"
-        full_note = f"{note} {suffix}".strip() if note else suffix
         edges.append(
             Edge(
                 id=edge_id,
                 type=cr.edge_type,
                 source_id=edge_source,
                 target_id=target_node_id,
-                confidence=confidence,
-                note=full_note,
+                derivation=edge_derivation,
+                score=edge_score,
+                cites=[
+                    Citation(
+                        kind="file_line",
+                        ref=f"{cr.source_file}#L{cr.line}-L{cr.line}",
+                        derivation=edge_derivation,
+                        score=edge_score,
+                    )
+                ],
+                note=note,
             )
         )
 
@@ -558,7 +566,8 @@ def parse_pr(
                         type=EdgeType.COVERS,
                         source_id=bs.node_id,
                         target_id=target_bs.node_id,
-                        confidence=Confidence.AMBIGUOUS,
+                        derivation=Derivation.HEURISTIC,
+                        score=0.4,
                         note="Heuristic: test-name substring match.",
                     )
                 )
@@ -625,17 +634,16 @@ def parse_pr(
             diagnostics=diagnostics,
         )
         edges.extend(new_edges)
-        llm_used = llm_enrich and (kept > 0 or dropped > 0 or unsure > 0 or any(e.confidence == Confidence.LLM_INFERRED for e in edges))
+        llm_used = llm_enrich and (kept > 0 or dropped > 0 or unsure > 0 or any(e.derivation == Derivation.LLM for e in edges))
 
     # 8. Build Graph + invariant validation ---------------------------------
     graph = Graph(
         generated_at=datetime.now(timezone.utc),
-        generator="prex 0.1.0",
+        generator="prex 0.2.0",
         pr=pr_meta,
         nodes=nodes,
         edges=edges,
         diagnostics=diagnostics,
-        llm_enrichment_used=llm_used,
     )
 
     # Re-validate after Graph construction (Pydantic validates field types; we add semantic invariants)

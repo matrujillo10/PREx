@@ -11,7 +11,7 @@ What this module does:
       local clone (Python only in v0) and scanning for word-boundary name hits.
     - Classify each hit by tree-sitter on the candidate file: is it inside a
       function/method/class body? Is it a `from X import name` statement?
-    - Emit `(source_id, target_id, EdgeType, Confidence)` tuples.
+    - Emit `(source_id, target_id, EdgeType, Derivation, score)` tuples.
 
 What this module deliberately does NOT do:
     - Resolve method-receiver types (no flow analysis).
@@ -31,7 +31,8 @@ from prex.parser._treesitter import (
     _PARSER,
     extract_symbols,
 )
-from prex.schemas.graph import Confidence, EdgeType
+from prex.schemas._shared import Derivation
+from prex.schemas.graph import EdgeType
 
 
 @dataclass
@@ -41,10 +42,11 @@ class CrossRef:
     source_file: str  # repo-relative path of the file containing the reference
     source_symbol_qualname: Optional[str]  # qualified name of enclosing symbol, if any
     target_name: str
-    target_qualname: Optional[str]  # set when uniquely resolvable; None means AMBIGUOUS
+    target_qualname: Optional[str]  # set when uniquely resolvable; None means heuristic pick
     line: int  # 1-indexed line of the reference
     edge_type: EdgeType
-    confidence: Confidence
+    derivation: Derivation
+    score: float  # 0..1 trust
 
 
 _SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build", ".tox", ".mypy_cache", ".pytest_cache"}
@@ -240,17 +242,19 @@ def find_cross_refs(
                 continue
             seen_file_target.add((rel_path, target_key))
             # Even a uniquely-changed-target name can be ambiguous if other places in the
-            # repo define the same name. Downgrade confidence accordingly.
+            # repo define the same name. Downgrade trust accordingly.
             repo_defs = def_count_by_name.get(name, 0)
             if len(sym_list) == 1 and repo_defs >= AMBIGUOUS_DEFINITION_SITES:
-                resolved_confidence = Confidence.AMBIGUOUS
+                resolved_derivation = Derivation.CROSSREF_TEXT
+                resolved_score = 0.5
             elif len(sym_list) == 1:
-                resolved_confidence = Confidence.EXACT
+                resolved_derivation = Derivation.CROSSREF_TEXT
+                resolved_score = 0.95  # word-boundary text match is strong but not proof
             else:
-                resolved_confidence = Confidence.AMBIGUOUS
+                resolved_derivation = Derivation.HEURISTIC
+                resolved_score = 0.4
             edge_type = _classify_edge(line_text, name)
             enclosing, _all_syms = _enclosing_symbol(repo_path, rel_path, lineno)
-            confidence = resolved_confidence
             target_qn = sym_list[0].qualified_name if len(sym_list) == 1 else None
             out.append(
                 CrossRef(
@@ -260,7 +264,8 @@ def find_cross_refs(
                     target_qualname=target_qn,
                     line=lineno,
                     edge_type=edge_type,
-                    confidence=confidence,
+                    derivation=resolved_derivation,
+                    score=resolved_score,
                 )
             )
     return out

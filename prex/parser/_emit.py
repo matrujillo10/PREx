@@ -4,10 +4,9 @@ from __future__ import annotations
 import json
 from typing import Iterable, List, Set, Tuple
 
+from prex.schemas._shared import ChangeState, Derivation, Diagnostic
 from prex.schemas.graph import (
-    ChangeState,
-    Confidence,
-    Diagnostic,
+    CallerStub,
     Edge,
     EdgeType,
     ExternalRefNode,
@@ -200,10 +199,10 @@ def to_mermaid(graph: Graph, *, only_impact: bool = True) -> str:
             continue
         arrow = "-->"
         label = e.type.value
-        if e.confidence == Confidence.LLM_INFERRED:
+        if e.derivation == Derivation.LLM:
             arrow = "-.->"
             label = f"{e.type.value} (llm)"
-        if e.confidence == Confidence.AMBIGUOUS:
+        elif e.score < 0.7:
             label = f"{e.type.value}?"
         lines.append(f'  {a} {arrow}|{label}| {b}')
 

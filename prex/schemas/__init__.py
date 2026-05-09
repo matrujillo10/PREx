@@ -1,8 +1,38 @@
-"""Schemas for PREx graph artifacts. Pydantic v2 source of truth + JSON Schema mirror."""
-from prex.schemas.graph import (
-    Confidence,
+"""Schemas for PREx output artifacts.
+
+Three modules:
+    - `_shared`  Citation, Diagnostic, LineRange, ChangeState, Derivation.
+    - `graph`    Graph + Node (Module/File/Symbol/CallerStub/Hunk/ExternalRef) + Edge + PRMetadata.
+    - `brief`    Brief + ReviewBrief + ReviewPlan + HunkInsight + ChecklistBinding (+ supporting models).
+
+Public API: `from prex.schemas import Brief, Graph, Citation, ...`.
+"""
+from prex.schemas._shared import (
     ChangeState,
+    Citation,
+    Derivation,
     Diagnostic,
+    LineRange,
+)
+from prex.schemas.brief import (
+    AdvisoryFlag,
+    BlastRadius,
+    Brief,
+    ChecklistBinding,
+    ChecklistItem,
+    ChecklistStatus,
+    HunkInsight,
+    HunkIntent,
+    Novelty,
+    PRType,
+    ReviewBrief,
+    ReviewPlan,
+    ReviewStep,
+    RiskSignal,
+    RiskTier,
+)
+from prex.schemas.graph import (
+    CallerStub,
     Edge,
     EdgeType,
     ExternalRefKind,
@@ -11,7 +41,6 @@ from prex.schemas.graph import (
     Graph,
     HunkChangeType,
     HunkNode,
-    LineRange,
     ModuleNode,
     Node,
     NodeKind,
@@ -21,8 +50,16 @@ from prex.schemas.graph import (
 )
 
 __all__ = [
-    "Confidence",
+    "AdvisoryFlag",
+    "BlastRadius",
+    "Brief",
+    "CallerStub",
     "ChangeState",
+    "ChecklistBinding",
+    "ChecklistItem",
+    "ChecklistStatus",
+    "Citation",
+    "Derivation",
     "Diagnostic",
     "Edge",
     "EdgeType",
@@ -31,12 +68,22 @@ __all__ = [
     "FileNode",
     "Graph",
     "HunkChangeType",
+    "HunkInsight",
+    "HunkIntent",
     "HunkNode",
     "LineRange",
     "ModuleNode",
     "Node",
     "NodeKind",
+    "Novelty",
+    "Novelty",
     "PRMetadata",
+    "PRType",
+    "ReviewBrief",
+    "ReviewPlan",
+    "ReviewStep",
+    "RiskSignal",
+    "RiskTier",
     "SymbolKind",
     "SymbolNode",
 ]

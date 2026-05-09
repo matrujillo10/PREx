@@ -1,24 +1,14 @@
 """PREx impact-graph schema.
 
-Single source of truth for the structure produced by `prex review <PR>`.
-Downstream Claude sessions and any UI/predicate engine consume these models.
+Topology of the PR: nodes (modules / files / symbols / hunks / external refs)
+and typed directed edges between them with diff-overlay state.
 
-Generation rules:
-    - Pydantic v2 models defined here are authoritative.
-    - `prex/schemas/graph.schema.json` is generated from `Graph.model_json_schema()`.
-      Never hand-edit it; regenerate via `python -m prex.schemas.gen`.
+This is the **deep store** that supports the briefing layer (`brief.py`).
+Citations from the briefing layer reach into this graph by node/edge id.
 
-Design overview:
-    The graph is a directed multigraph with five node kinds and eight edge types.
-    Nodes form a discriminated union over `kind`; edges are uniform.
-
-    Tree view  = projection over (contains, defines, touches), filtered to non-unchanged.
-    Impact view = projection over (calls, references, imports), reverse-traversed
-                  from changed Symbol nodes to depth N (N=1 in v0).
-
-    Every node and edge carries:
-        - `change_state`: how the diff overlay sees it
-        - `confidence`:   how the resolver knew about it
+Schema version 0.2.0 — confidence enum dropped in favour of `derivation` +
+`score`; unchanged callers materialised as lightweight `CallerStub` rather
+than full `SymbolNode`s.
 """
 from __future__ import annotations
 
@@ -28,80 +18,68 @@ from typing import Annotated, List, Literal, Optional, Union
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from prex.schemas._shared import (
+    ChangeState,
+    Citation,
+    Derivation,
+    Diagnostic,
+    LineRange,
+)
 
-# ---------- enums ----------
+
+# ---------- enums (graph-specific) ----------
 
 
 class NodeKind(str, Enum):
-    """Top-level node category. Discriminator for the polymorphic Node union.
-
-    Each kind maps to one Pydantic model with a fixed `kind` literal.
-    """
+    """Top-level node category. Discriminator for the polymorphic Node union."""
 
     MODULE = "module"
     FILE = "file"
     SYMBOL = "symbol"
+    CALLER_STUB = "caller_stub"  # lightweight unchanged caller (qualified_name + file_id only)
     HUNK = "hunk"
     EXTERNAL_REF = "external_ref"
 
 
 class SymbolKind(str, Enum):
-    """Sub-kind of a Symbol node. The reviewer-visible classification of a definition."""
+    """Sub-kind of a Symbol node."""
 
-    FUNCTION = "function"  # Top-level function (def at module scope).
-    METHOD = "method"  # Function defined inside a class body.
-    CLASS = "class"  # Class definition.
-    TYPE = "type"  # Type alias, TypedDict, dataclass-style type-only def.
-    CONST = "const"  # Top-level assignment treated as constant (ALL_CAPS or annotated).
-    TEST = "test"  # Function/method that is a test entry point (pytest convention).
+    FUNCTION = "function"
+    METHOD = "method"
+    CLASS = "class"
+    TYPE = "type"
+    CONST = "const"
+    TEST = "test"
 
 
 class ExternalRefKind(str, Enum):
-    """Category of an external (out-of-repo) reference.
+    """Category of an external (out-of-repo) reference."""
 
-    Used for things the call graph cannot resolve symbolically because they live
-    outside the codebase (database, network) but are still load-bearing for review.
-    """
-
-    DB_TABLE = "db_table"  # Postgres/MySQL/etc. table referenced by name in a SQL string.
-    HTTP_ROUTE = "http_route"  # HTTP route attached via decorator or framework registration.
-    GRPC_METHOD = "grpc_method"  # gRPC method name registered to a servicer.
-    PACKAGE = "package"  # External Python/JS/etc. package import.
-    OTHER = "other"  # Catch-all for newly-detected resource kinds.
-
-
-class ChangeState(str, Enum):
-    """Node-level diff overlay.
-
-    Computed by overlaying the unified diff on the AST: a node is `added` if it
-    appears only at head_sha, `removed` if only at base_sha, `modified` if any
-    hunk overlaps its line range, otherwise `unchanged`.
-    """
-
-    UNCHANGED = "unchanged"
-    ADDED = "added"
-    MODIFIED = "modified"
-    REMOVED = "removed"
+    DB_TABLE = "db_table"
+    HTTP_ROUTE = "http_route"
+    GRPC_METHOD = "grpc_method"
+    PACKAGE = "package"
+    OTHER = "other"
 
 
 class HunkChangeType(str, Enum):
-    """Hunk-level diff direction. A hunk is the smallest atomic edit unit in a unified diff."""
+    """Hunk-level diff direction."""
 
-    ADDED = "added"  # Pure addition (no `-` lines).
-    MODIFIED = "modified"  # Mixed +/- lines in the same hunk.
-    REMOVED = "removed"  # Pure deletion (no `+` lines).
+    ADDED = "added"
+    MODIFIED = "modified"
+    REMOVED = "removed"
 
 
 class EdgeType(str, Enum):
     """Typed, directed edge.
 
     Allowed source/target kinds per type:
-        contains:    Module->File, File->Symbol, File->Hunk
-        defines:     Hunk->Symbol  (this hunk creates or modifies the symbol's signature)
-        touches:     Hunk->Symbol  (this hunk overlaps body, no signature change)
-        calls:       Symbol->Symbol
-        references:  Symbol->Symbol  (non-call: type usage, identifier read, attribute access)
-        imports:     File->Symbol or File->Module
+        contains:    Module->File, File->Symbol, File->Hunk, File->CallerStub
+        defines:     Hunk->Symbol  (signature-affecting change)
+        touches:     Hunk->Symbol  (body-only change)
+        calls:       (Symbol|CallerStub)->Symbol
+        references:  (Symbol|CallerStub)->Symbol  (non-call: type usage / read)
+        imports:     File->(Symbol|Module|CallerStub)
         covers:      Symbol(symbol_kind=test)->Symbol
         external:    Symbol->ExternalRef
     """
@@ -116,70 +94,35 @@ class EdgeType(str, Enum):
     EXTERNAL = "external"
 
 
-class Confidence(str, Enum):
-    """Provenance / certainty of the node or edge.
-
-    `exact`        — derived directly from tree-sitter AST or stack-graphs/SCIP semantic resolution.
-    `ambiguous`    — multiple candidates resolved by name; pick is heuristic. UI should badge.
-    `llm_inferred` — produced by --llm-enrich. UI must badge distinctly; not authoritative.
-    """
-
-    EXACT = "exact"
-    AMBIGUOUS = "ambiguous"
-    LLM_INFERRED = "llm_inferred"
-
-
-# ---------- supporting structs ----------
-
-
-class LineRange(BaseModel):
-    """Inclusive 1-indexed line range in a file at a given SHA."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    start: int = Field(ge=1, description="1-indexed start line.")
-    end: int = Field(ge=1, description="1-indexed end line, inclusive of `start`.")
+# ---------- supporting structs (graph-only) ----------
 
 
 class PRMetadata(BaseModel):
     """Identifying info for the PR the graph was built from.
 
     Captures everything needed to reproduce the parse: repo, base/head SHAs,
-    branch names, plus surface metadata for UI display.
+    branch names, plus surface metadata for UI display. The full PR `body`
+    is preserved here so the briefing layer can extract author intent.
     """
 
     model_config = ConfigDict(extra="forbid")
 
-    url: str = Field(description="Canonical PR URL (e.g. https://github.com/<org>/<repo>/pull/<n>).")
-    repo: str = Field(description="Owner/name slug, e.g. 'connectlyai/connectly-backend'.")
-    number: int = Field(ge=1, description="PR number within the repo.")
-    title: str = Field(description="PR title at fetch time.")
-    author: str = Field(description="Login of PR author.")
-    base_ref: str = Field(description="Base branch name (usually 'main').")
-    head_ref: str = Field(description="Head branch name.")
-    base_sha: str = Field(min_length=7, description="Commit SHA of the base.")
-    head_sha: str = Field(min_length=7, description="Commit SHA of the head.")
-    additions: int = Field(ge=0, description="Total lines added across all files.")
-    deletions: int = Field(ge=0, description="Total lines removed across all files.")
-    changed_files: int = Field(ge=0, description="Total file count touched by the PR.")
-
-
-class Diagnostic(BaseModel):
-    """Non-fatal warning emitted during graph construction.
-
-    Used to surface stack-graphs misses, ripgrep ambiguities, schema invariant
-    violations, and any LLM enrichment failures. Reviewer-visible.
-    """
-
-    model_config = ConfigDict(extra="forbid")
-
-    level: Literal["info", "warn", "error"] = Field(description="Severity of the diagnostic.")
-    code: str = Field(description="Stable identifier (e.g. 'STACK_GRAPHS_NO_CALLERS', 'INVARIANT_ORPHAN_EDGE').")
-    message: str = Field(description="Human-readable description.")
-    related_node_ids: List[str] = Field(
-        default_factory=list,
-        description="Node IDs this diagnostic refers to. Empty for global diagnostics.",
+    url: str = Field(description="Canonical PR URL.")
+    repo: str = Field(description="Owner/name slug.")
+    number: int = Field(ge=1)
+    title: str
+    body: Optional[str] = Field(
+        default=None,
+        description="Full PR body / description as fetched from the host. Used for intent extraction.",
     )
+    author: str
+    base_ref: str
+    head_ref: str
+    base_sha: str = Field(min_length=7)
+    head_sha: str = Field(min_length=7)
+    additions: int = Field(ge=0)
+    deletions: int = Field(ge=0)
+    changed_files: int = Field(ge=0)
 
 
 # ---------- nodes (discriminated union by `kind`) ----------
@@ -188,116 +131,106 @@ class Diagnostic(BaseModel):
 class _NodeBase(BaseModel):
     """Common fields for all node kinds. Not instantiated directly.
 
-    `id` is the stable, globally-unique identifier within one graph document.
-    Recommended id format: `<kind>:<stable-key>` where stable-key is a path,
-    qualified name, or hash. The CLI keeps ids deterministic for a given PR.
+    `id` is stable and globally-unique within one graph document.
+    Recommended id format: `<kind>:<stable-key>` (e.g. `symbol:foo.bar.baz`).
     """
 
     model_config = ConfigDict(extra="forbid")
 
     id: str = Field(description="Globally unique within this graph. Format: '<kind>:<stable-key>'.")
-    confidence: Confidence = Field(
-        default=Confidence.EXACT,
-        description="How certain the resolver is about this node's existence/identity.",
+    derivation: Derivation = Field(
+        default=Derivation.AST,
+        description="How the resolver derived this node's existence.",
+    )
+    score: float = Field(
+        default=1.0,
+        ge=0.0,
+        le=1.0,
+        description="0..1 trust score. AST/diff sources default to 1.0; LLM-inferred is lower.",
     )
     change_state: ChangeState = Field(
         default=ChangeState.UNCHANGED,
         description="Diff overlay state of this node.",
+    )
+    cites: List[Citation] = Field(
+        default_factory=list,
+        description="Optional citations supporting this node's existence/identity.",
     )
 
 
 class ModuleNode(_NodeBase):
     """A logical module — a directory containing source files belonging to one unit."""
 
-    kind: Literal[NodeKind.MODULE] = Field(default=NodeKind.MODULE, description="Discriminator.")
-    name: str = Field(description="Dotted or path-shaped module identifier (e.g. 'agent_evaluation').")
-    path: str = Field(description="Repo-relative directory path of the module root.")
+    kind: Literal[NodeKind.MODULE] = Field(default=NodeKind.MODULE)
+    name: str = Field(description="Dotted/path-shaped module identifier.")
+    path: str = Field(description="Repo-relative directory path.")
 
 
 class FileNode(_NodeBase):
     """A source file at head_sha (or base_sha if removed)."""
 
-    kind: Literal[NodeKind.FILE] = Field(default=NodeKind.FILE, description="Discriminator.")
-    path: str = Field(description="Repo-relative file path.")
-    language: str = Field(
-        description="tree-sitter grammar name, e.g. 'python', 'typescript', 'sql', 'proto'.",
-    )
+    kind: Literal[NodeKind.FILE] = Field(default=NodeKind.FILE)
+    path: str
+    language: str = Field(description="tree-sitter grammar name (e.g. 'python').")
     generated: bool = Field(
         default=False,
-        description=(
-            "True if classified as generated/codegen (proto-gen, openapi, lockfile, snapshot). "
-            "Generated files should be collapsed in UIs by default."
-        ),
+        description="True if classified as generated/codegen. Collapse by default in UIs.",
     )
 
 
 class SymbolNode(_NodeBase):
     """A named, addressable definition: function, method, class, type, const, or test."""
 
-    kind: Literal[NodeKind.SYMBOL] = Field(default=NodeKind.SYMBOL, description="Discriminator.")
-    symbol_kind: SymbolKind = Field(description="Sub-classification of the symbol.")
-    name: str = Field(description="Local name without path (e.g. 'query_evaluated_sessions').")
+    kind: Literal[NodeKind.SYMBOL] = Field(default=NodeKind.SYMBOL)
+    symbol_kind: SymbolKind
+    name: str
     qualified_name: str = Field(
-        description=(
-            "Module-rooted dotted name. "
-            "Example: 'agent_evaluation.controller.controller.query_evaluated_sessions'."
-        ),
+        description="Module-rooted dotted name (e.g. 'pkg.mod.Class.method').",
     )
-    file_id: str = Field(description="ID of the FileNode containing this symbol.")
-    line_range: LineRange = Field(
-        description="Lines in head_sha where the symbol's definition lives (or base_sha if removed).",
-    )
-    signature: Optional[str] = Field(
-        default=None,
-        description="One-line signature when extractable (e.g. 'def foo(a: int) -> str:').",
-    )
+    file_id: str
+    line_range: LineRange
+    signature: Optional[str] = Field(default=None, description="One-line signature if extractable.")
     public: bool = Field(
         default=False,
-        description=(
-            "Heuristic: not '_'-prefixed; in __all__; appears in proto/openapi/IDL; "
-            "or referenced from outside its declaring module."
-        ),
+        description="Heuristic: not '_'-prefixed, in __all__, or referenced cross-module.",
     )
+
+
+class CallerStub(_NodeBase):
+    """Lightweight reference to an unchanged symbol that calls/imports a changed one.
+
+    Materialised in place of a full `SymbolNode` for symbols outside the changed
+    file set. Saves bytes; the host LLM can still attach an edge label without
+    rendering the stub as if it were a peer of changed symbols.
+    """
+
+    kind: Literal[NodeKind.CALLER_STUB] = Field(default=NodeKind.CALLER_STUB)
+    qualified_name: str
+    file_id: str = Field(description="ID of the FileNode containing this caller.")
+    symbol_kind: Optional[SymbolKind] = None
 
 
 class HunkNode(_NodeBase):
-    """A contiguous diff region within a single file. The atomic unit of change."""
+    """A contiguous diff region within one file. The atomic unit of change."""
 
-    kind: Literal[NodeKind.HUNK] = Field(default=NodeKind.HUNK, description="Discriminator.")
-    file_id: str = Field(description="ID of the FileNode this hunk lives in.")
-    line_range: LineRange = Field(
-        description="Lines at head_sha (or base_sha for removed-only hunks).",
-    )
-    change_type: HunkChangeType = Field(description="Whether the hunk is added/modified/removed.")
-    patch: str = Field(
-        description="Unified-diff fragment for this hunk: '@@' header plus +/-/' ' lines.",
-    )
+    kind: Literal[NodeKind.HUNK] = Field(default=NodeKind.HUNK)
+    file_id: str
+    line_range: LineRange = Field(description="Lines at head_sha (or base_sha if removed-only).")
+    change_type: HunkChangeType
+    patch: str = Field(description="Unified-diff fragment ('@@' header + body).")
 
 
 class ExternalRefNode(_NodeBase):
     """A reference to a resource outside the codebase (DB table, HTTP route, etc.)."""
 
-    kind: Literal[NodeKind.EXTERNAL_REF] = Field(
-        default=NodeKind.EXTERNAL_REF, description="Discriminator."
-    )
-    ref_kind: ExternalRefKind = Field(description="Category of external resource.")
-    name: str = Field(
-        description=(
-            "Canonical name. Examples: 'ticket_associations' (db_table), "
-            "'POST /v1/sessions' (http_route), 'agent_evaluation.v1.QueryEvaluatedSessions' (grpc_method)."
-        ),
-    )
-    detail: Optional[str] = Field(
-        default=None,
-        description=(
-            "Optional structured detail. For db_table: JSON path or column expression used. "
-            "For http_route: handler module. Free-form."
-        ),
-    )
+    kind: Literal[NodeKind.EXTERNAL_REF] = Field(default=NodeKind.EXTERNAL_REF)
+    ref_kind: ExternalRefKind
+    name: str
+    detail: Optional[str] = None
 
 
 Node = Annotated[
-    Union[ModuleNode, FileNode, SymbolNode, HunkNode, ExternalRefNode],
+    Union[ModuleNode, FileNode, SymbolNode, CallerStub, HunkNode, ExternalRefNode],
     Field(discriminator="kind"),
 ]
 
@@ -308,30 +241,29 @@ Node = Annotated[
 class Edge(BaseModel):
     """Typed directed edge between two nodes.
 
-    Allowed source/target kind combinations are constrained by `EdgeType` semantics
-    (see EdgeType docstring). The Graph-level invariant check enforces them at emit.
+    Each cross-file caller edge MUST carry at least one `Citation` (typically
+    a `file_line` reference to the call site). Other edges may carry zero.
     """
 
     model_config = ConfigDict(extra="forbid")
 
-    id: str = Field(description="Globally unique edge id. Format: '<type>:<source_id>->-<target_id>'.")
-    type: EdgeType = Field(description="Edge type.")
-    source_id: str = Field(description="ID of the source node.")
-    target_id: str = Field(description="ID of the target node.")
-    confidence: Confidence = Field(
-        default=Confidence.EXACT,
-        description="Provenance of this edge (resolver determines).",
-    )
+    id: str = Field(description="Globally unique edge id.")
+    type: EdgeType
+    source_id: str
+    target_id: str
+    derivation: Derivation = Field(default=Derivation.AST, description="How this edge was derived.")
+    score: float = Field(default=1.0, ge=0.0, le=1.0, description="0..1 trust.")
     change_state: ChangeState = Field(
         default=ChangeState.UNCHANGED,
-        description=(
-            "Edge-level diff overlay. An edge is `added` if it exists only at head_sha, "
-            "`removed` if only at base_sha, `unchanged` otherwise."
-        ),
+        description="Edge-level diff overlay (added/removed/modified/unchanged).",
+    )
+    cites: List[Citation] = Field(
+        default_factory=list,
+        description="Citations grounding this edge — usually file_line references to a call site.",
     )
     note: Optional[str] = Field(
         default=None,
-        description="Free-text annotation. Especially used for llm_inferred edges to record reasoning.",
+        description="Free-text annotation. Especially used for llm-derived reasoning.",
     )
 
 
@@ -339,38 +271,24 @@ class Edge(BaseModel):
 
 
 class Graph(BaseModel):
-    """Complete impact graph for one PR. Versioned root document.
-
-    Backwards-compatibility: bump `schema_version` on any breaking change.
-    Downstream consumers should pin to a major version range.
-    """
+    """Complete impact graph for one PR. Versioned root document."""
 
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: Literal["0.1.0"] = Field(
-        default="0.1.0", description="Semantic version of this schema. Bump on breaking change."
+    schema_version: Literal["0.2.0"] = Field(
+        default="0.2.0",
+        description="Semantic version. v0.2 dropped Confidence enum + added CallerStub.",
     )
-    generated_at: datetime = Field(description="UTC timestamp when the graph was emitted.")
-    generator: str = Field(description="Tool name + version, e.g. 'prex 0.1.0'.")
-    pr: PRMetadata = Field(description="Identifying info for the PR.")
-    nodes: List[Node] = Field(
-        description="Heterogeneous node list, discriminated by 'kind'.",
-    )
-    edges: List[Edge] = Field(description="All edges in the graph.")
-    diagnostics: List[Diagnostic] = Field(
-        default_factory=list,
-        description="Non-fatal warnings emitted during construction.",
-    )
-    llm_enrichment_used: bool = Field(
-        default=False,
-        description="True iff at least one node/edge has confidence=llm_inferred.",
-    )
+    generated_at: datetime
+    generator: str
+    pr: PRMetadata
+    nodes: List[Node]
+    edges: List[Edge]
+    diagnostics: List[Diagnostic] = Field(default_factory=list)
 
 
 __all__ = [
-    "ChangeState",
-    "Confidence",
-    "Diagnostic",
+    "CallerStub",
     "Edge",
     "EdgeType",
     "ExternalRefKind",
@@ -379,7 +297,6 @@ __all__ = [
     "Graph",
     "HunkChangeType",
     "HunkNode",
-    "LineRange",
     "ModuleNode",
     "Node",
     "NodeKind",

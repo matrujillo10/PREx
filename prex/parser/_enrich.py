@@ -28,7 +28,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
 
-from prex.schemas.graph import Confidence, Diagnostic, Edge, EdgeType
+from prex.schemas._shared import Citation, Derivation, Diagnostic
+from prex.schemas.graph import Edge, EdgeType
 
 
 _LOG = logging.getLogger("prex.enrich")
@@ -187,12 +188,18 @@ def disambiguate_method_callers(
         )
         return edges, 0, 0, 0
 
-    # Bucket ambiguous edges by target_id (which is the changed-target node id)
+    # Bucket low-confidence cross-ref edges by target_id (which is the changed-target node id).
+    # "Low confidence" = HEURISTIC derivation (multi-candidate guesses) OR CROSSREF_TEXT with score < 1.0
+    # (text match where the name has multiple definition sites in the repo).
     ambiguous_by_target: Dict[str, List[int]] = {}
     for idx, e in enumerate(edges):
-        if e.confidence != Confidence.AMBIGUOUS:
-            continue
         if e.type not in (EdgeType.CALLS, EdgeType.REFERENCES, EdgeType.IMPORTS):
+            continue
+        is_ambiguous = (
+            e.derivation == Derivation.HEURISTIC
+            or (e.derivation == Derivation.CROSSREF_TEXT and e.score < 0.9)
+        )
+        if not is_ambiguous:
             continue
         ambiguous_by_target.setdefault(e.target_id, []).append(idx)
 
@@ -274,14 +281,16 @@ def disambiguate_method_callers(
                 e = new_edges[cs.edge_index]
                 if v == "T":
                     new_edges[cs.edge_index] = e.model_copy(update={
-                        "confidence": Confidence.LLM_INFERRED,
+                        "derivation": Derivation.LLM,
+                        "score": 0.85,
                         "note": f"LLM resolved to TARGET. {why}",
                     })
                     kept += 1
                 elif v == "O":
                     # Drop: replace with a sentinel that we filter post-pass
                     new_edges[cs.edge_index] = e.model_copy(update={
-                        "confidence": Confidence.LLM_INFERRED,
+                        "derivation": Derivation.LLM,
+                        "score": 0.0,
                         "note": f"LLM-DROPPED: not target. {why}",
                     })
                     dropped += 1
@@ -296,18 +305,19 @@ def disambiguate_method_callers(
     return filtered, kept, dropped, unsure
 
 
-_AT_RE = re.compile(r"\[at ([^\]]+):(\d+)\]")
+_FILELINE_RE = re.compile(r"^([^#]+)#L(\d+)(?:-L\d+)?$")
 
 
 def _extract_file_line_from_edge(edge: Edge, nodes_by_id: Dict[str, Any]) -> Tuple[Optional[str], int]:
-    """Cross-ref edges store file:line in `note` as '[at <path>:<lineno>]'."""
-    if edge.note:
-        m = _AT_RE.search(edge.note)
-        if m:
-            try:
-                return m.group(1), int(m.group(2))
-            except ValueError:
-                pass
+    """Cross-ref edges store file:line in `cites: List[Citation]` (kind='file_line')."""
+    for c in edge.cites or []:
+        if c.kind == "file_line":
+            m = _FILELINE_RE.match(c.ref)
+            if m:
+                try:
+                    return m.group(1), int(m.group(2))
+                except ValueError:
+                    pass
     src = nodes_by_id.get(edge.source_id)
     if src is None:
         return None, 0
