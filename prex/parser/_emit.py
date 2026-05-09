@@ -115,8 +115,14 @@ classDef base fill:#fff,stroke:#666,color:#111
 """.strip()
 
 
+import hashlib
+
+
 def _mermaid_id(s: str) -> str:
-    return "n_" + "".join(c if (c.isalnum() or c == "_") else "_" for c in s)[:80]
+    """Stable, collision-free Mermaid id. Truncate prefix + append short hash of full id."""
+    safe = "".join(c if (c.isalnum() or c == "_") else "_" for c in s)
+    digest = hashlib.sha1(s.encode("utf-8")).hexdigest()[:8]
+    return f"n_{safe[:60]}_{digest}"
 
 
 def _node_class(n) -> str:

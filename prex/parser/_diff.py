@@ -47,6 +47,32 @@ class Hunk:
             return "removed"
         return "modified"
 
+    def head_changed_lines(self) -> set[int]:
+        """Return the set of head-side 1-indexed lines that are actually '+' lines.
+
+        Context lines (' ') and removed lines ('-') are excluded. This is what
+        we should overlap against to decide whether a symbol is touched —
+        the diff hunk header reports a wider range that includes context.
+        """
+        out: set[int] = set()
+        body_lines = self.text.split("\n", 1)[1].splitlines() if "\n" in self.text else []
+        cur = self.new_start
+        for raw in body_lines:
+            if not raw:
+                cur += 1
+                continue
+            tag = raw[0]
+            if tag == "+":
+                out.add(cur)
+                cur += 1
+            elif tag == "-":
+                # removed line — does not advance head pointer
+                continue
+            else:
+                # context line (' ' or '\\') advances head pointer
+                cur += 1
+        return out
+
 
 @dataclass
 class FileDiff:

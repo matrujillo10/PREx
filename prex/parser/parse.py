@@ -233,13 +233,38 @@ def parse_pr(
         base_syms = _treesitter.extract_symbols(base_src, rel_path) if base_src else []
         base_qns: Set[str] = {s.qualified_name for s in base_syms}
 
+        # Pre-compute method ranges per class so we can decide ownership of a hunk.
+        method_ranges_by_class: Dict[str, List[Tuple[int, int]]] = {}
+        for s in head_syms:
+            if s.kind in ("method", "test") and "." in s.qualified_name:
+                # last dot separates method from class qualname
+                class_qn = s.qualified_name.rsplit(".", 1)[0]
+                method_ranges_by_class.setdefault(class_qn, []).append((s.start_line, s.end_line))
+
+        # Compute the set of actually-added/removed head lines per file once.
+        head_change_lines: Set[int] = set()
+        for hunk in fd.hunks:
+            head_change_lines.update(hunk.head_changed_lines())
+
         for sym in head_syms:
             change_state = ChangeState.UNCHANGED
-            sym_range = (sym.start_line, sym.end_line)
-            for hunk in fd.hunks:
-                if _diff.overlaps(sym_range, hunk.head_line_range):
+            sym_lines = set(range(sym.start_line, sym.end_line + 1))
+            sym_changed = head_change_lines & sym_lines
+            if sym.kind == "class":
+                # A class is "modified" when a + line is inside its body AND
+                # no inner method's range also contains that line. This claims
+                # ownership of class-body field additions but defers method
+                # body changes to the method symbol.
+                method_ranges = method_ranges_by_class.get(sym.qualified_name, [])
+                method_lines: Set[int] = set()
+                for mr_start, mr_end in method_ranges:
+                    method_lines.update(range(mr_start, mr_end + 1))
+                class_owned_changed = sym_changed - method_lines
+                if class_owned_changed:
                     change_state = ChangeState.MODIFIED
-                    break
+            else:
+                if sym_changed:
+                    change_state = ChangeState.MODIFIED
             if sym.qualified_name not in base_qns:
                 change_state = ChangeState.ADDED
 
@@ -272,14 +297,16 @@ def parse_pr(
                 change_state=change_state,
             )
 
-            # Defines / touches edges from hunks to this symbol
+            # Defines / touches edges from hunks to this symbol — only emit when
+            # the hunk has +/- lines actually inside the symbol body, not just
+            # surrounding context.
             for h_idx, hunk in enumerate(fd.hunks):
-                if not _diff.overlaps(sym_range, hunk.head_line_range):
+                hunk_changed = hunk.head_changed_lines()
+                if not (hunk_changed & sym_lines):
                     continue
                 hunk_id = _node_id("hunk", f"{rel_path}#{h_idx}")
-                # Heuristic for defines vs touches: signature line overlap means defines
                 signature_line = sym.start_line
-                signature_overlap = hunk.head_line_range[0] <= signature_line <= hunk.head_line_range[1]
+                signature_overlap = signature_line in hunk_changed
                 edge_type = EdgeType.DEFINES if signature_overlap or change_state == ChangeState.ADDED else EdgeType.TOUCHES
                 edges.append(
                     Edge(
@@ -317,10 +344,10 @@ def parse_pr(
                 change_state=ChangeState.REMOVED,
             )
 
-        # SQL external refs: scan changed-hunk lines only.
+        # SQL external refs: only NEW tables (in head but not in base) AND in changed hunks.
         head_text = head_src.decode("utf-8", errors="replace")
-        head_lines = head_text.splitlines()
-        sql_refs = _external.find_sql_refs(head_text)
+        base_text = base_src.decode("utf-8", errors="replace") if base_src else None
+        sql_refs = _external.find_new_sql_refs(head_text, base_text)
         seen_tables: Set[str] = set()
         for ref in sql_refs:
             # Only emit refs whose line is inside a changed hunk
