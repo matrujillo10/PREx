@@ -1,15 +1,14 @@
 """Cross-file reference resolver.
 
-v0 strategy: stack-graphs is the documented intent (see plan), but the Python
-binding (`tree_sitter_stack_graphs`) is not yet stable enough to ship as a
-hard dependency on macOS without native build tooling. We therefore start with
-a **ripgrep-based resolver** that delivers the same edges with `confidence` set
-to AMBIGUOUS when name collision is possible. Stack-graphs swaps in cleanly
-later because the public surface here returns the same edge tuples.
+v0 strategy: stack-graphs is the documented intent (see plan), but its Python
+binding requires native build tooling. We therefore start with a **native
+Python text-search resolver** that delivers the same edge shape with
+`confidence=AMBIGUOUS` when name collision is possible. Stack-graphs swaps in
+cleanly later because the public surface here returns the same edge tuples.
 
 What this module does:
-    - For each changed Symbol, find candidate caller files via ripgrep over
-      the local clone (Python only in v0).
+    - For each changed Symbol, find candidate caller files by walking the
+      local clone (Python only in v0) and scanning for word-boundary name hits.
     - Classify each hit by tree-sitter on the candidate file: is it inside a
       function/method/class body? Is it a `from X import name` statement?
     - Emit `(source_id, target_id, EdgeType, Confidence)` tuples.
@@ -21,8 +20,7 @@ What this module deliberately does NOT do:
 """
 from __future__ import annotations
 
-import shutil
-import subprocess
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -49,36 +47,44 @@ class CrossRef:
     confidence: Confidence
 
 
+_SKIP_DIRS = {".git", "node_modules", "__pycache__", ".venv", "venv", "dist", "build", ".tox", ".mypy_cache", ".pytest_cache"}
+
+
 def have_ripgrep() -> bool:
-    return shutil.which("rg") is not None
+    """Always True now — we use native Python search. Kept for API compatibility."""
+    return True
 
 
-def _rg_search(repo_path: Path, term: str, globs: Iterable[str]) -> List[Tuple[str, int, str]]:
-    """Run ripgrep with word-boundary search. Returns list of (file, line, line_text)."""
-    if not have_ripgrep():
-        return []
-    cmd = [
-        "rg", "--no-heading", "--with-filename", "--line-number",
-        "--word-regexp", "--fixed-strings",
-    ]
-    for g in globs:
-        cmd.extend(["-g", g])
-    cmd.extend([term, str(repo_path)])
-    try:
-        out = subprocess.run(cmd, capture_output=True, text=True, check=False)
-    except Exception:
-        return []
+def _walk_files(repo_path: Path, suffixes: Iterable[str]) -> List[Path]:
+    """Yield candidate files, skipping common noise dirs. Suffixes like ('.py',)."""
+    out: List[Path] = []
+    suffix_set = set(suffixes)
+    for entry in repo_path.rglob("*"):
+        if entry.is_dir():
+            continue
+        # Reject under any skip-dir component
+        if any(part in _SKIP_DIRS for part in entry.parts):
+            continue
+        if entry.suffix in suffix_set:
+            out.append(entry)
+    return out
+
+
+def _search_term_in_files(
+    files: List[Path],
+    term: str,
+) -> List[Tuple[str, int, str]]:
+    """Word-boundary search for `term` across files. Returns (abs_path, line, text)."""
+    pattern = re.compile(r"\b" + re.escape(term) + r"\b")
     hits: List[Tuple[str, int, str]] = []
-    for line in out.stdout.splitlines():
-        # format: <abs_path>:<lineno>:<text>
-        parts = line.split(":", 2)
-        if len(parts) < 3:
-            continue
-        file, lineno, text = parts
+    for f in files:
         try:
-            hits.append((file, int(lineno), text))
-        except ValueError:
+            text = f.read_text(encoding="utf-8", errors="replace")
+        except Exception:
             continue
+        for i, line in enumerate(text.splitlines(), start=1):
+            if pattern.search(line):
+                hits.append((str(f), i, line))
     return hits
 
 
@@ -150,11 +156,18 @@ def find_cross_refs(
     excluded = {p.replace("\\", "/") for p in exclude_paths}
     out: List[CrossRef] = []
 
+    # Translate file_globs (e.g. "*.py") to suffixes ('.py').
+    suffixes = {("." + g.split(".")[-1]) for g in file_globs if "." in g}
+    files = _walk_files(repo_path, suffixes)
+
     for name, sym_list in by_name.items():
         # Skip dunder names — too noisy.
         if name.startswith("__") and name.endswith("__"):
             continue
-        hits = _rg_search(repo_path, name, file_globs)
+        # Skip very short or very common names — too many false positives.
+        if len(name) < 4:
+            continue
+        hits = _search_term_in_files(files, name)
         seen: set[Tuple[str, int]] = set()
         for abs_file, lineno, line_text in hits:
             rel_path = _rel(abs_file, repo_path)
