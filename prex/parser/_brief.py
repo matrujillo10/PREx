@@ -1,15 +1,18 @@
 """Build a `Brief` (the briefing layer) from a fully-resolved `Graph`.
 
 Deterministic in v1 — every field is computed from graph topology +
-AST-derived risk signals. LLM prose calls (one_liner, headline, plan What/Why/Impact)
-are wired in `_brief_llm.py` and gated by `--llm-summarise`.
+AST-derived risk signals + manifest predicates. LLM prose calls
+(one_liner, headline, plan What/Why/Impact) are gated by `--llm-summarise`.
 """
 from __future__ import annotations
 
 import re
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+from prex.manifest import find_manifest, load_manifest
+from prex.manifest.predicates import evaluate as evaluate_predicate
 from prex.parser._signals import signals_for_hunk
 from prex.schemas._shared import Citation, Derivation, Diagnostic
 from prex.schemas.brief import (
@@ -17,6 +20,7 @@ from prex.schemas.brief import (
     BlastRadius,
     Brief,
     ChecklistBinding,
+    ChecklistItem,
     HunkInsight,
     Novelty,
     PRType,
@@ -360,7 +364,55 @@ def _advisory_flags(graph: Graph, blast: BlastRadius) -> List[AdvisoryFlag]:
     return flags
 
 
-def build_brief(graph: Graph, *, graph_ref: str = "graph.json") -> Brief:
+def _build_checklist(graph: Graph, brief_so_far: Brief, manifest_path: Optional[Path] = None) -> Tuple[List[ChecklistBinding], List[Diagnostic]]:
+    """Resolve manifest, run predicates, return checklist bindings + diagnostics."""
+    diagnostics: List[Diagnostic] = []
+    repo_path: Optional[Path] = None  # we don't have it here directly; predicates rely on graph topology only
+    path = find_manifest(repo_path=Path("."), override=manifest_path)
+    if path is None:
+        diagnostics.append(
+            Diagnostic(
+                level="info",
+                code="MANIFEST_NOT_FOUND",
+                message="No .review/types.yaml found; manifest checklist empty.",
+            )
+        )
+        return [], diagnostics
+    try:
+        manifest = load_manifest(path)
+    except Exception as e:
+        diagnostics.append(
+            Diagnostic(
+                level="warn",
+                code="MANIFEST_PARSE_FAILED",
+                message=f"Could not parse manifest at {path}: {e}",
+            )
+        )
+        return [], diagnostics
+
+    bindings: List[ChecklistBinding] = []
+    for section in manifest.sections:
+        items: List[ChecklistItem] = []
+        # If section has a type and brief.review.pr_type doesn't match, skip the section.
+        if section.type is not None and brief_so_far.review.pr_type != section.type:
+            continue
+        for rule in section.rules:
+            result = evaluate_predicate(rule.predicate, graph, brief_so_far)
+            items.append(
+                ChecklistItem(
+                    id=rule.id,
+                    text=rule.text,
+                    required=rule.required,
+                    targets=result.targets,
+                    auto_status=result.status,
+                    auto_evidence=result.evidence,
+                )
+            )
+        bindings.append(ChecklistBinding(type=section.type, checklist_items=items))
+    return bindings, diagnostics
+
+
+def build_brief(graph: Graph, *, graph_ref: str = "graph.json", manifest_path: Optional[Path] = None) -> Brief:
     """Compute the deterministic briefing layer from a built graph."""
     pr_type, pr_type_conf, pr_type_cites = _detect_pr_type(graph)
     blast = _compute_blast_radius(graph)
@@ -388,15 +440,39 @@ def build_brief(graph: Graph, *, graph_ref: str = "graph.json") -> Brief:
         cites=[],
     )
 
-    return Brief(
+    brief_skeleton = Brief(
         generated_at=datetime.now(timezone.utc),
         generator="prex 0.2.0",
         pr=graph.pr,
         review=review,
         plan=plan,
         hunks=hunk_insights,
-        checklist=[],  # populated in Build 2
+        checklist=[],
         graph_ref=graph_ref,
         diagnostics=[],
         llm_used=False,
     )
+
+    # Manifest checklist needs the brief skeleton to evaluate predicates that
+    # depend on hunk_insights (like risk-signal-based ones).
+    checklist, manifest_diags = _build_checklist(graph, brief_skeleton, manifest_path)
+    brief_skeleton.checklist = checklist
+    brief_skeleton.diagnostics = manifest_diags
+
+    # Add manifest-derived advisory flags from failed required rules.
+    for binding in checklist:
+        for item in binding.checklist_items:
+            if item.id == "secret_like_string_added" and item.auto_status == "fail":
+                if "secret_like_string_added" not in brief_skeleton.review.advisory_flags:
+                    brief_skeleton.review.advisory_flags.append("secret_like_string_added")
+            if item.id == "no_doc_change_for_public_api" and item.auto_status == "fail":
+                if "no_docs_for_public_api" not in brief_skeleton.review.advisory_flags:
+                    brief_skeleton.review.advisory_flags.append("no_docs_for_public_api")
+            if item.id == "broad_except_added" and item.auto_status == "fail":
+                if "broad_except_added" not in brief_skeleton.review.advisory_flags:
+                    brief_skeleton.review.advisory_flags.append("broad_except_added")
+            if item.id == "assertion_removed" and item.auto_status == "fail":
+                if "removes_assertion" not in brief_skeleton.review.advisory_flags:
+                    brief_skeleton.review.advisory_flags.append("removes_assertion")
+
+    return brief_skeleton

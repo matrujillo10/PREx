@@ -21,6 +21,7 @@ import click
 
 from prex.parser import parse_pr
 from prex.parser._brief import build_brief
+from prex.parser._brief_llm import enrich_brief_with_llm
 from prex.parser._emit import to_json, to_mermaid
 
 
@@ -58,7 +59,11 @@ def review(
     graph_path = out / "graph.json"
     graph_path.write_text(to_json(graph) + "\n")
 
-    brief = build_brief(graph, graph_ref="graph.json")
+    manifest_p = Path(manifest_path).expanduser() if manifest_path else None
+    brief = build_brief(graph, graph_ref="graph.json", manifest_path=manifest_p)
+
+    if llm_summarise:
+        brief = enrich_brief_with_llm(graph, brief, diagnostics=brief.diagnostics)
     brief_path = out / "brief.json"
     brief_path.write_text(brief.model_dump_json(indent=2) + "\n")
 
