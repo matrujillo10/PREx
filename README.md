@@ -205,4 +205,8 @@ PREx/
 
 ## Credits
 
-Designed against four real PRs in `connectlyai/connectly-backend` (with permission). Hi-fi design handoff in `docs/wireframe-prompt.md`. Built in a hackathon. No license declared yet — don't ship to prod without sorting that.
+Designed against four real PRs in `connectlyai/connectly-backend` (with permission). Hi-fi design handoff in `docs/wireframe-prompt.md`. Built in a hackathon.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
