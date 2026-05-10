@@ -1,4 +1,5 @@
 import { serve } from "@hono/node-server";
+import { cors } from "hono/cors";
 import {
   CopilotRuntime,
   createCopilotEndpoint,
@@ -24,6 +25,19 @@ const app = createCopilotEndpoint({
     openGenerativeUI: true,
   }),
 });
+
+// Allow the Next.js dev origin to call this BFF directly so SSE streams
+// bypass the Next rewrite (which buffers under turbopack). FRONTEND_ORIGIN
+// must be set when running outside http://localhost:3010.
+app.use(
+  "/api/copilotkit/*",
+  cors({
+    origin: process.env.FRONTEND_ORIGIN ?? "http://localhost:3010",
+    credentials: true,
+    allowMethods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization", "X-CopilotKit-Runtime-Client-GQL-Version"],
+  }),
+);
 
 // Rewrite known 5xx error bodies into structured `{ error, hint, command }`
 // payloads the UI can render as actionable toasts. Conservative matching —

@@ -21,7 +21,11 @@ export function CopilotKitProviderShell({
 }) {
   return (
     <CopilotKitProvider
-      runtimeUrl="/api/copilotkit"
+      // Point directly at the BFF in dev to bypass the Next.js rewrite,
+      // which buffers SSE under turbopack and blocks streamed tool-call
+      // events until the connection closes. NEXT_PUBLIC_BFF_URL must be
+      // set in apps/frontend/.env.local (e.g. http://localhost:4000).
+      runtimeUrl={`${process.env.NEXT_PUBLIC_BFF_URL ?? ""}/api/copilotkit`}
       publicApiKey={process.env.NEXT_PUBLIC_COPILOT_CLOUD_PUBLIC_API_KEY}
       openGenerativeUI={{}}
     >
