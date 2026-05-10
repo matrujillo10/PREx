@@ -1,9 +1,13 @@
-import { ChatShell } from "../components/ChatShell";
+import { lazy, Suspense } from "react";
 import { ChecklistColumn } from "../components/ChecklistColumn";
 import { DiffColumn } from "../components/DiffColumn";
 import { Hero } from "../components/Hero";
 import { PlanColumn } from "../components/PlanColumn";
 import styles from "./ReviewSurface.module.css";
+
+const ChatShell = lazy(() =>
+  import("../components/ChatShell").then((m) => ({ default: m.ChatShell })),
+);
 
 export function ReviewSurface() {
   return (
@@ -15,8 +19,28 @@ export function ReviewSurface() {
         <ChecklistColumn />
       </div>
       <div className={styles.chat}>
-        <ChatShell scope="pr" />
+        <Suspense fallback={<ChatLoading />}>
+          <ChatShell scope="pr" />
+        </Suspense>
       </div>
     </>
+  );
+}
+
+function ChatLoading() {
+  return (
+    <div
+      style={{
+        border: "1px dashed var(--border)",
+        borderRadius: 6,
+        padding: "14px 16px",
+        background: "var(--surface)",
+        color: "var(--muted)",
+        fontStyle: "italic",
+        fontSize: 13,
+      }}
+    >
+      Loading Copilot…
+    </div>
   );
 }

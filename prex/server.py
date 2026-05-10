@@ -1,18 +1,22 @@
 """Local HTTP server for the PREx UI.
 
-Serves the pre-built Vite bundle from `prex/_ui_dist/` plus two API endpoints:
+Serves the pre-built Vite bundle from `prex/_ui_dist/` plus three API endpoints:
 
-    GET /api/brief   ->  artifact_dir/brief.json
-    GET /api/graph   ->  artifact_dir/graph.json
+    GET  /api/brief   ->  artifact_dir/brief.json
+    GET  /api/graph   ->  artifact_dir/graph.json
+    POST /api/chat    ->  SSE stream of agent text + tool_use events (Anthropic backend)
 
-Single-user, localhost-only, read-only. We use the stdlib `http.server` because
-the routing surface is four routes and we don't want to drag in a framework.
+Single-user, localhost-only. We use the stdlib `http.server`; for the chat
+streaming we hand-write SSE chunks rather than pulling in a framework.
 """
 from __future__ import annotations
 
+import json
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Tuple
+
+from prex.agent import stream_chat
 
 UI_DIST = Path(__file__).parent / "_ui_dist"
 
@@ -41,6 +45,32 @@ def _make_handler(artifact_dir: Path) -> type[SimpleHTTPRequestHandler]:
             if not (target.is_file() and ui_dist in target.parents):
                 self.path = "/index.html"
             return super().do_GET()
+
+        def do_POST(self):  # noqa: N802
+            if self.path != "/api/chat":
+                self.send_error(404, "no such endpoint")
+                return
+            length = int(self.headers.get("Content-Length", "0") or 0)
+            try:
+                payload = json.loads(self.rfile.read(length).decode("utf-8") or "{}")
+            except json.JSONDecodeError:
+                self.send_error(400, "invalid JSON")
+                return
+            messages = payload.get("messages") or []
+            scope = payload.get("scope") or "pr"
+            self.send_response(200)
+            self.send_header("Content-Type", "text/event-stream")
+            self.send_header("Cache-Control", "no-cache, no-transform")
+            self.send_header("X-Accel-Buffering", "no")
+            self.send_header("Connection", "keep-alive")
+            self.end_headers()
+            try:
+                for chunk in stream_chat(artifact_dir, messages, scope):
+                    self.wfile.write(chunk)
+                    self.wfile.flush()
+            except (BrokenPipeError, ConnectionResetError):
+                # client disconnected
+                return
 
         def _serve_json(self, p: Path) -> None:
             if not p.is_file():

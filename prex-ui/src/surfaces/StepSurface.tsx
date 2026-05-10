@@ -1,10 +1,13 @@
-import { useEffect, useMemo } from "react";
+import { lazy, Suspense, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Edge, FileNode, GraphNode, ReviewStep, SymbolNode } from "../api/types";
-import { ChatShell } from "../components/ChatShell";
 import { CitationLink } from "../components/CitationLink";
 import { useStore } from "../state/store";
 import styles from "./StepSurface.module.css";
+
+const ChatShell = lazy(() =>
+  import("../components/ChatShell").then((m) => ({ default: m.ChatShell })),
+);
 
 export function StepSurface() {
   const params = useParams<{ rank: string }>();
@@ -79,7 +82,9 @@ export function StepSurface() {
             impact
           />
         </div>
-        <ChatShell scope={`step:${step.rank}`} />
+        <Suspense fallback={<div style={{ color: "var(--muted)", fontStyle: "italic" }}>Loading Copilot…</div>}>
+          <ChatShell scope={`step:${step.rank}`} />
+        </Suspense>
         <div className={styles.nav}>
           {step.rank > 1 && (
             <button onClick={() => navigate(`/step/${step.rank - 1}`)}>

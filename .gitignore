@@ -10,6 +10,11 @@ build/
 prex-ui/dist/
 prex-ui/node_modules/
 
+# secrets — never commit
+.env
+.env.*
+!.env.example
+
 # prex artifacts
 graph.json
 graph.mmd
