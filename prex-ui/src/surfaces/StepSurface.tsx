@@ -1,7 +1,15 @@
 import { lazy, Suspense, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import type { Edge, FileNode, GraphNode, ReviewStep, SymbolNode } from "../api/types";
+import type {
+  Edge,
+  FileNode,
+  GraphNode,
+  HunkNode,
+  ReviewStep,
+  SymbolNode,
+} from "../api/types";
 import { CitationLink } from "../components/CitationLink";
+import { HunkBlock } from "../components/HunkBlock";
 import { useStore } from "../state/store";
 import styles from "./StepSurface.module.css";
 
@@ -35,6 +43,12 @@ export function StepSurface() {
 
   const target = graph?.nodes.find((n) => n.id === step.target);
   const callers = useCallers(graph?.nodes ?? [], graph?.edges ?? [], step.target);
+  const hunks = useStepHunks(graph?.nodes ?? [], graph?.edges ?? [], step.target);
+  const insightByHunk = useMemo(() => {
+    const m = new Map<string, (typeof brief.hunks)[number]>();
+    for (const h of brief.hunks) m.set(h.hunk_id, h);
+    return m;
+  }, [brief.hunks]);
 
   return (
     <div className={styles.body}>
@@ -83,7 +97,25 @@ export function StepSurface() {
           />
         </div>
         <Suspense fallback={<div style={{ color: "var(--muted)", fontStyle: "italic" }}>Loading Copilot…</div>}>
+          {hunks.length > 0 && (
+          <section style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <span className={styles.qn} style={{ background: "transparent", border: "none", padding: 0, color: "var(--muted)", fontFamily: "var(--mono)", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              {hunks.length === 1 ? "Hunk under this step" : `Hunks under this step (${hunks.length})`}
+            </span>
+            {hunks.map((h) => (
+              <HunkBlock
+                key={h.id}
+                hunk={h}
+                file={fileForHunk(graph?.nodes ?? [], h)}
+                insight={insightByHunk.get(h.id)}
+                current
+              />
+            ))}
+          </section>
+        )}
+        <Suspense fallback={<div style={{ color: "var(--muted)", fontStyle: "italic" }}>Loading Copilot…</div>}>
           <ChatShell scope={`step:${step.rank}`} />
+        </Suspense>
         </Suspense>
         <div className={styles.nav}>
           {step.rank > 1 && (
@@ -178,6 +210,48 @@ function render(text: string | null | undefined): string {
     .replace(/>/g, "&gt;")
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\b(\d+)\b/g, "<b>$1</b>");
+}
+
+function useStepHunks(nodes: GraphNode[], edges: Edge[], targetId: string): HunkNode[] {
+  return useMemo(() => {
+    if (!targetId) return [];
+    if (targetId.startsWith("hunk:")) {
+      const h = nodes.find((n) => n.id === targetId);
+      return h && h.kind === "hunk" ? [h] : [];
+    }
+    if (targetId.startsWith("symbol:")) {
+      const ids = new Set<string>();
+      for (const e of edges) {
+        if ((e.type === "defines" || e.type === "touches") && e.target_id === targetId) {
+          ids.add(e.source_id);
+        }
+      }
+      const out: HunkNode[] = [];
+      for (const n of nodes) {
+        if (n.kind === "hunk" && ids.has(n.id)) out.push(n);
+      }
+      out.sort((a, b) => a.line_range.start - b.line_range.start);
+      return out;
+    }
+    return [];
+  }, [nodes, edges, targetId]);
+}
+
+function fileForHunk(nodes: GraphNode[], hunk: HunkNode): FileNode {
+  const f = nodes.find((n) => n.id === hunk.file_id);
+  if (f && f.kind === "file") return f;
+  // Defensive fallback so the component still renders something sensible.
+  return {
+    id: hunk.file_id,
+    kind: "file",
+    path: "(unknown file)",
+    language: "unknown",
+    generated: false,
+    derivation: "ast",
+    score: 1,
+    change_state: "modified",
+    cites: [],
+  } as FileNode;
 }
 
 function useCallers(nodes: GraphNode[], edges: Edge[], targetId: string) {
