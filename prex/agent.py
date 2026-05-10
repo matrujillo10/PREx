@@ -222,6 +222,96 @@ TOOLS: List[Dict[str, Any]] = [
         },
     },
     {
+        "name": "render_review_brief",
+        "description": "Render the PR-level briefing card: risk badge + headline + blast-radius stats + advisory flags. Use when the reviewer asks 'give me the brief', 'what is this PR', 'risk overview'.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "pr_type": {"type": "string"},
+                "pr_type_confidence": {"type": "number"},
+                "risk_tier": {"type": "string", "enum": ["trivial", "standard", "sensitive"]},
+                "risk_score": {"type": "number"},
+                "blast_radius": {
+                    "type": "object",
+                    "properties": {
+                        "caller_files": {"type": "integer"},
+                        "modules_crossed": {"type": "integer"},
+                        "public_symbols_modified": {"type": "integer"},
+                        "external_refs_added": {"type": "integer"},
+                    },
+                    "required": ["caller_files", "modules_crossed", "public_symbols_modified", "external_refs_added"],
+                },
+                "novelty": {
+                    "type": "object",
+                    "properties": {
+                        "new_files": {"type": "integer"},
+                        "new_symbols": {"type": "integer"},
+                        "new_external_refs": {"type": "integer"},
+                    },
+                },
+                "headline": {"type": "string"},
+                "advisory_flags": {"type": "array", "items": {"type": "string"}},
+                "source": {"type": "string"},
+            },
+            "required": ["pr_type", "risk_tier", "risk_score", "blast_radius"],
+        },
+    },
+    {
+        "name": "render_review_plan",
+        "description": "Render the suggested reading-plan card: ranked steps with What/Why/Impact + risk signals. Use when the reviewer asks 'where do I start', 'show me the plan', 'reading order'.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "overview": {"type": "string"},
+                "source": {"type": "string"},
+                "steps": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "rank": {"type": "integer", "minimum": 1},
+                            "title": {"type": "string"},
+                            "what": {"type": "string"},
+                            "why": {"type": "string"},
+                            "impact": {"type": "string"},
+                            "estimated_minutes": {"type": "integer"},
+                            "risk_signals": {"type": "array", "items": {"type": "string"}},
+                            "target": {"type": "string"},
+                        },
+                        "required": ["rank"],
+                    },
+                },
+            },
+            "required": ["steps"],
+        },
+    },
+    {
+        "name": "render_checklist",
+        "description": "Render the manifest checklist as grouped pass/fail/unknown rows. Use when the reviewer asks 'what failed', 'is anything missing', 'show the checklist'.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "source": {"type": "string"},
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "id": {"type": "string"},
+                            "text": {"type": "string"},
+                            "required": {"type": "boolean"},
+                            "status": {"type": "string", "enum": ["pass", "fail", "unknown"]},
+                            "targets_count": {"type": "integer"},
+                            "evidence": {"type": "string"},
+                        },
+                        "required": ["id", "text", "status"],
+                    },
+                },
+            },
+            "required": ["items"],
+        },
+    },
+    {
         "name": "render_sequence",
         "description": "Render a sequence diagram with actor lifelines + messages. message.kind sql highlights SQL traffic in accent. Use for 'show me the call sequence' answers.",
         "input_schema": {
@@ -276,6 +366,9 @@ SYSTEM_BASE = textwrap.dedent("""\
       - Never include unified-diff content in prose; the reviewer has the diff column.
 
     Tool catalog — pick the SHAPE that fits, then fill it:
+      - render_review_brief     (PR-level hero: risk + blast + advisory)
+      - render_review_plan      (ranked reading plan: What/Why/Impact)
+      - render_checklist        (manifest auto-checks: pass/fail/unknown)
       - render_treemap          (file-by-file change density)
       - render_coupling_map     (cross-symbol/file couplings; derivation='llm' = dashed accent)
       - render_class_diff       (before/after class shape with added/removed/modified fields)
@@ -284,12 +377,23 @@ SYSTEM_BASE = textwrap.dedent("""\
       - render_sequence         (actor lifelines + messages; kind='sql' for db hops)
 
     Default mappings (use these unless the reviewer overrides):
-      - "where is the change densest" / "what files matter"        → render_treemap
-      - "anything sneaky" / "hidden coupling" / "who else uses X"  → render_coupling_map
-      - "what changed in this class"                                → render_class_diff
-      - "who is affected by this" / "blast radius"                  → render_blast_radius
-      - "how does X flow through" / "trace the field"               → render_data_flow_chain
-      - "what's the sequence of calls" / "show me the SQL path"     → render_sequence
+      - "give me the brief" / "what is this PR" / "risk overview"   → render_review_brief
+      - "where do I start" / "reading order" / "show the plan"      → render_review_plan
+      - "what failed" / "show the checklist" / "anything missing"   → render_checklist
+      - "where is the change densest" / "what files matter"         → render_treemap
+      - "anything sneaky" / "hidden coupling" / "who else uses X"   → render_coupling_map
+      - "what changed in this class"                                 → render_class_diff
+      - "who is affected by this" / "blast radius"                   → render_blast_radius
+      - "how does X flow through" / "trace the field"                → render_data_flow_chain
+      - "what's the sequence of calls" / "show me the SQL path"      → render_sequence
+
+    On the special user message "__GREETING__" (or when the reviewer first opens
+    the PR with no prior context), emit, IN ORDER:
+      1. render_review_brief
+      2. render_review_plan
+      3. render_checklist
+    Plus a ≤20-word welcome caption above. Use the brief data verbatim — do NOT
+    re-summarise; do NOT shorten; pass every field you have.
 
     Faithfulness rules:
       - For tool args, derive ids from the graph node ids you have seen below; do not invent.

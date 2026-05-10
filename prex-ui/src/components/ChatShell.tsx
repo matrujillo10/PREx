@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { BlastRadius } from "../a2gui/BlastRadius";
+import { ChecklistCard } from "../a2gui/ChecklistCard";
 import { ClassDiff } from "../a2gui/ClassDiff";
 import { CouplingMap } from "../a2gui/CouplingMap";
 import { DataFlowChain } from "../a2gui/DataFlowChain";
+import { PlanCard } from "../a2gui/PlanCard";
+import { ReviewBriefCard } from "../a2gui/ReviewBriefCard";
 import { Sequence } from "../a2gui/Sequence";
 import { Treemap } from "../a2gui/Treemap";
 import { useStore } from "../state/store";
@@ -20,6 +23,9 @@ const RENDERERS: Record<string, (args: any) => JSX.Element> = {
   render_blast_radius: (a) => <BlastRadius {...a} />,
   render_data_flow_chain: (a) => <DataFlowChain {...a} />,
   render_sequence: (a) => <Sequence {...a} />,
+  render_review_brief: (a) => <ReviewBriefCard {...a} />,
+  render_review_plan: (a) => <PlanCard {...a} />,
+  render_checklist: (a) => <ChecklistCard {...a} />,
 };
 
 interface ToolCall {
@@ -53,34 +59,55 @@ export function ChatShell({ scope }: Props) {
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
+  const greetedRef = useRef<string | null>(null);
 
   // Reset conversation when scope changes.
   useEffect(() => {
     abortRef.current?.abort();
     setTurns([]);
     setBusy(false);
+    greetedRef.current = null;
   }, [scope]);
 
   useEffect(() => () => abortRef.current?.abort(), []);
 
+  // Auto-greet on first mount of a scope so the chat opens with the brief +
+  // plan + checklist already rendered as A2GUI cards.
+  useEffect(() => {
+    if (greetedRef.current === scope) return;
+    greetedRef.current = scope;
+    sendInternal("__GREETING__");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scope]);
+
   const send = async () => {
     const trimmed = draft.trim();
     if (!trimmed || busy) return;
-    const next: Turn[] = [...turns, { role: "user", text: trimmed }];
-    setTurns([...next, { role: "assistant", text: "" }]);
     setDraft("");
+    await sendInternal(trimmed);
+  };
+
+  const sendInternal = async (userText: string) => {
+    if (busy) return;
+    const isGreeting = userText === "__GREETING__";
+    // For the silent greeting we still want the assistant turn to render, but
+    // we skip showing the literal '__GREETING__' user bubble.
+    const next: Turn[] = isGreeting
+      ? [...turns]
+      : [...turns, { role: "user", text: userText }];
+    setTurns([...next, { role: "assistant", text: "" }]);
     setBusy(true);
 
     const controller = new AbortController();
     abortRef.current = controller;
     try {
+      const wireMessages = isGreeting
+        ? [...next.map((t) => ({ role: t.role, content: t.text })), { role: "user", content: "__GREETING__" }]
+        : next.map((t) => ({ role: t.role, content: t.text }));
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          scope,
-          messages: next.map((t) => ({ role: t.role, content: t.text })),
-        }),
+        body: JSON.stringify({ scope, messages: wireMessages }),
         signal: controller.signal,
       });
       if (!res.ok || !res.body) {
