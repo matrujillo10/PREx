@@ -62,7 +62,10 @@ def _make_handler(artifact_dir: Path) -> type[SimpleHTTPRequestHandler]:
             self.send_header("Content-Type", "text/event-stream")
             self.send_header("Cache-Control", "no-cache, no-transform")
             self.send_header("X-Accel-Buffering", "no")
-            self.send_header("Connection", "keep-alive")
+            # Close after the stream so the client's fetch reader sees a definitive
+            # end-of-body. With keep-alive on a chunked-style stream the browser
+            # waits indefinitely for more events and the input stays disabled.
+            self.send_header("Connection", "close")
             self.end_headers()
             try:
                 for chunk in stream_chat(artifact_dir, messages, scope):
