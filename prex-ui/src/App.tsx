@@ -4,6 +4,7 @@ import { fetchBrief, fetchGraph } from "./api/client";
 import { AppFrame } from "./layout/AppFrame";
 import { CitationDrawer } from "./layout/CitationDrawer";
 import { useStore } from "./state/store";
+import { GraphSurface } from "./surfaces/GraphSurface";
 import { ReviewSurface } from "./surfaces/ReviewSurface";
 import { StepSurface } from "./surfaces/StepSurface";
 
@@ -33,6 +34,7 @@ export function App() {
         <Routes>
           <Route path="/" element={<ReviewSurface />} />
           <Route path="/step/:rank" element={<StepSurface />} />
+          <Route path="/graph" element={<GraphSurface />} />
         </Routes>
         <CitationDrawer />
       </AppFrame>

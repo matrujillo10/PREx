@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { Link } from "react-router-dom";
 import { useStore } from "../state/store";
 import styles from "./AppFrame.module.css";
 
@@ -20,6 +21,10 @@ export function AppFrame({ children }: Props) {
         ) : (
           <span className={styles.crumb}>loading…</span>
         )}
+        <nav style={{ marginLeft: "auto", display: "flex", gap: 12, fontFamily: "var(--mono)", fontSize: 11 }}>
+          <Link to="/" style={{ color: "var(--ink-3)" }}>review</Link>
+          <Link to="/graph" style={{ color: "var(--ink-3)" }}>graph</Link>
+        </nav>
       </header>
       <div className={styles.frame}>{children}</div>
       {brief && (
