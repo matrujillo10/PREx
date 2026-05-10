@@ -46,6 +46,21 @@ def _make_handler(artifact_dir: Path) -> type[SimpleHTTPRequestHandler]:
                 self.path = "/index.html"
             return super().do_GET()
 
+        def end_headers(self):  # noqa: D401
+            # Prevent the browser from caching index.html — it references hashed
+            # JS bundles that get deleted on rebuild, so a stale HTML cache
+            # would 404 the JS and render a blank page. Hashed assets are
+            # safe to cache aggressively.
+            path = (self.path or "").split("?", 1)[0]
+            if path in ("/", "/index.html") or path.endswith(".html"):
+                self.send_header("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0")
+                self.send_header("Pragma", "no-cache")
+                self.send_header("Expires", "0")
+            elif "/assets/" in path:
+                # Hashed filenames — safe to cache.
+                self.send_header("Cache-Control", "public, max-age=31536000, immutable")
+            super().end_headers()
+
         def do_POST(self):  # noqa: N802
             if self.path != "/api/chat":
                 self.send_error(404, "no such endpoint")
