@@ -1,35 +1,27 @@
 .body {
   display: grid;
-  grid-template-columns: 320px 1fr 290px;
+  grid-template-columns: 300px 1fr 260px 380px;
   border-bottom: 1px solid var(--border);
-  /* Tall enough to comfortably fit the plan overview + at least one full
-     step card; columns scroll internally so the chat region stays in view
-     just below the fold. */
-  height: 720px;
-  max-height: 78vh;
+  /* Permanent chat panel as the rightmost column. Each column scrolls
+     internally so the page itself doesn't grow with chat history. */
+  height: 760px;
+  max-height: 82vh;
   overflow: hidden;
 }
 
-.chat {
+.chatCol {
+  border-left: 1px solid var(--border-2);
   background: var(--surface-2);
-  padding: 24px;
-  border-top: 1px solid var(--border);
-}
-
-.chatPlaceholder {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  color: var(--muted);
-  font-size: 13px;
-  font-style: italic;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
-.chatBox {
-  border: 1px dashed var(--border);
-  border-radius: 6px;
-  padding: 14px 16px;
-  background: var(--surface);
-  font-style: italic;
-  color: var(--muted);
+.chatColInner {
+  padding: 14px;
+  overflow-y: auto;
+  flex: 1;
+  min-height: 0;
 }

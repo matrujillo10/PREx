@@ -17,11 +17,13 @@ export function ReviewSurface() {
         <PlanColumn />
         <DiffColumn />
         <ChecklistColumn />
-      </div>
-      <div className={styles.chat}>
-        <Suspense fallback={<ChatLoading />}>
-          <ChatShell scope="pr" />
-        </Suspense>
+        <aside className={styles.chatCol}>
+          <div className={styles.chatColInner}>
+            <Suspense fallback={<ChatLoading />}>
+              <ChatShell scope="pr" />
+            </Suspense>
+          </div>
+        </aside>
       </div>
     </>
   );
