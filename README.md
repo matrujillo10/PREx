@@ -8,6 +8,8 @@ prex review https://github.com/connectlyai/connectly-backend/pull/19858
 
 That's it. Browser opens. You see the diff with semantic overlays, and a chat that emits **typed visualisations** — coupling maps, blast-radius graphs, class diffs, sequence diagrams — drawn in real time as you ask questions.
 
+![PREx demo](docs/screenshots/demo.gif)
+
 ---
 
 ## Why this exists
