@@ -1,12 +1,17 @@
 .body {
   display: grid;
-  grid-template-columns: 300px 1fr 260px 380px;
+  /* Tightened so 4-column layout fits down to ~1100px viewports.
+     Each column has min-width: 0 to keep grid from blowing out. */
+  grid-template-columns: 280px minmax(0, 1fr) 240px 340px;
   border-bottom: 1px solid var(--border);
-  /* Permanent chat panel as the rightmost column. Each column scrolls
-     internally so the page itself doesn't grow with chat history. */
   height: 760px;
   max-height: 82vh;
   overflow: hidden;
+}
+
+.body > * {
+  min-width: 0;
+  min-height: 0;
 }
 
 .chatCol {
@@ -14,14 +19,22 @@
   background: var(--surface-2);
   display: flex;
   flex-direction: column;
-  min-height: 0;
   height: 100%;
   overflow: hidden;
 }
 
 .chatColInner {
-  padding: 14px;
+  padding: 12px;
   overflow-y: auto;
   flex: 1;
   min-height: 0;
+}
+
+@media (max-width: 1100px) {
+  .body {
+    grid-template-columns: 260px minmax(0, 1fr) 320px;
+  }
+  .chatCol {
+    display: none;
+  }
 }
