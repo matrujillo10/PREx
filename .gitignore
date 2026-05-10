@@ -6,6 +6,10 @@ __pycache__/
 build/
 /dist/
 
+# UI build dir is committed (ships in wheel); only the prex-ui working tree's dist is ignored.
+prex-ui/dist/
+prex-ui/node_modules/
+
 # prex artifacts
 graph.json
 graph.mmd

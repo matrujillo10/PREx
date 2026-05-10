@@ -1,0 +1,169 @@
+.col {
+  border-right: 1px solid var(--border-2);
+  background: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.colH {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-2);
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 11px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.colH .ttl {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.colH .meta {
+  margin-left: auto;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.overview {
+  margin: 14px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.list {
+  padding: 0 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+}
+
+.step {
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: 8px;
+  padding: 12px 14px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stepSelected {
+  border-color: var(--accent);
+  background: var(--accent-soft2);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 4px 12px -6px rgba(176, 74, 58, 0.25);
+}
+
+.stepEmpty .rank {
+  background: var(--surface-3);
+  color: var(--muted);
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.rank {
+  background: var(--ink);
+  color: var(--surface);
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepSelected .rank {
+  background: var(--accent);
+}
+
+.ttl {
+  flex: 1;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.minutes {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.label {
+  display: inline-block;
+  width: 52px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  vertical-align: top;
+}
+
+.empty {
+  font-style: italic;
+  color: var(--muted);
+}
+
+.signals {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.sigChip {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  color: var(--muted);
+}
+
+.sigChipRisk {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: var(--accent-soft);
+}
+
+.impactHi b {
+  color: var(--accent);
+  font-weight: 600;
+}

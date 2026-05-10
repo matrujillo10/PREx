@@ -22,3 +22,6 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["prex*"]
+
+[tool.setuptools.package-data]
+prex = ["_ui_dist/**/*", "schemas/dist/*.json"]

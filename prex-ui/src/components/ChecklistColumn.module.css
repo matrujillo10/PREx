@@ -1,0 +1,113 @@
+.col {
+  border-left: 1px solid var(--border-2);
+  background: var(--surface-2);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.colH {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border-2);
+  font-size: 11px;
+  font-family: var(--mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+.list {
+  padding: 14px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.groupH {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.row {
+  background: var(--surface);
+  border: 1px solid var(--border-2);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  column-gap: 10px;
+  row-gap: 4px;
+  font-size: 12.5px;
+}
+
+.icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 11px;
+  font-family: var(--mono);
+}
+
+.iconFail {
+  background: var(--accent);
+  color: var(--surface);
+  border: 1px solid var(--accent);
+}
+
+.iconPass {
+  background: var(--surface);
+  color: var(--add);
+  border: 1px solid var(--add);
+}
+
+.iconUnknown {
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px dashed var(--muted-2);
+}
+
+.text {
+  color: var(--ink-2);
+}
+
+.meta {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+
+.metaPill {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 3px;
+  padding: 1px 6px;
+  border: 1px solid var(--accent-soft);
+}
+
+.evidenceLink {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}

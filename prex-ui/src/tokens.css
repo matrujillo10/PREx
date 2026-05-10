@@ -1,0 +1,78 @@
+/* Design tokens — copy verbatim from design handoff README.
+   Accent (terracotta) is reserved EXCLUSIVELY for risk indicators.
+   Do not use it for chrome, links, or hover states. */
+
+:root {
+  /* warm-paper neutrals */
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --surface-2: #faf8f3;
+  --surface-3: #f0ede5;
+  --border: #e3e0d8;
+  --border-2: #ecebe4;
+  --border-3: #f1efe8;
+
+  /* ink scale */
+  --ink: #1f1f1d;
+  --ink-2: #3a3a37;
+  --ink-3: #585852;
+  --muted: #6e6c66;
+  --muted-2: #9c998f;
+  --muted-3: #c2bfb5;
+
+  /* accent — RISK ONLY */
+  --accent: #b04a3a;
+  --accent-hi: #c45a48;
+  --accent-soft: #f5e3dd;
+  --accent-soft2: #fbeee9;
+
+  /* diff + status */
+  --add: #1f7a3d;
+  --add-bg: #eaf3ec;
+  --del: #a4453b;
+  --del-bg: #f6e7e2;
+  --info: #1f5fa8;
+  --info-soft: #e7eef6;
+
+  /* type */
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial,
+    sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+code {
+  font-family: var(--mono);
+  font-size: 0.93em;
+}
+
+::selection {
+  background: var(--accent-soft);
+}

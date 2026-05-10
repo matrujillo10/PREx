@@ -1,25 +1,33 @@
 """prex CLI entry point.
 
-Default invocation produces four artifacts under output/:
+Default invocation:
+    prex review <PR-URL>
+
+Parses the PR, writes artifacts under output/pr-<number>/, then starts a local
+HTTP server and opens the browser to the rendered review experience.
+
+Artifacts written:
     graph.json              — full impact graph (deep store for citations)
     brief.json              — briefing for the host LLM (the primary input)
-    manifest.snapshot.yaml  — copy of the .review/types.yaml used (Build 2)
+    manifest.snapshot.yaml  — copy of the .review/types.yaml used
     CONTRACT.md             — auto-generated description of the artifacts
 
 Examples:
     prex review https://github.com/connectlyai/connectly-backend/pull/19858
     prex review <url> --llm-enrich              # disambiguate ambiguous cross-refs
-    prex review <url> --llm-summarise           # fill prose fields (one_liner / headline / What/Why/Impact)
+    prex review <url> --llm-summarise           # fill prose fields
+    prex review <url> --no-open                 # don't auto-open the browser
+    prex review <url> --port 5173               # pin the server port
     prex review <url> --debug-mermaid           # also write output/graph.mmd
 """
 from __future__ import annotations
 
+import shutil
+import webbrowser
 from pathlib import Path
 from typing import Optional
 
 import click
-
-import shutil
 
 from prex.manifest import find_manifest
 from prex.manifest.contract_renderer import write_contract
@@ -27,6 +35,8 @@ from prex.parser import parse_pr
 from prex.parser._brief import build_brief
 from prex.parser._brief_llm import enrich_brief_with_llm
 from prex.parser._emit import to_json, to_mermaid
+from prex.parser._pr import parse_pr_url
+from prex.server import serve
 
 
 @click.group()
@@ -36,25 +46,45 @@ def main() -> None:
 
 @main.command()
 @click.argument("pr_url")
-@click.option("--out-dir", "out_dir", default="output", show_default=True, type=click.Path(), help="Directory for all output artifacts.")
-@click.option("--llm-enrich/--no-llm-enrich", default=False, help="LLM disambiguation of ambiguous cross-ref edges. Requires GCP ADC + Vertex AI.")
-@click.option("--llm-summarise/--no-llm-summarise", default=False, help="LLM-fill prose fields (one_liner, headline, What/Why/Impact).")
-@click.option("--include-tests/--no-include-tests", default=False, help="Include test-file callers as graph nodes. Default off.")
-@click.option("--debug-mermaid/--no-debug-mermaid", default=False, help="Also write output/graph.mmd for debugging.")
-@click.option("--manifest", "manifest_path", default=None, type=click.Path(), help="Path to .review/types.yaml. Defaults to repo's own / bundled fallback.")
-@click.option("--work-dir", default=None, type=click.Path(), help="Local clone cache root. Defaults to ~/.cache/prex/repos.")
+@click.option(
+    "--out-dir",
+    "out_dir",
+    default=None,
+    type=click.Path(),
+    help="Directory for output artifacts. Defaults to output/pr-<number>/.",
+)
+@click.option("--llm-enrich/--no-llm-enrich", default=False, help="LLM disambiguation of ambiguous cross-ref edges.")
+@click.option("--llm-summarise/--no-llm-summarise", default=False, help="LLM-fill prose fields.")
+@click.option("--include-tests/--no-include-tests", default=False, help="Include test-file callers as graph nodes.")
+@click.option("--debug-mermaid/--no-debug-mermaid", default=False, help="Also write graph.mmd for debugging.")
+@click.option("--manifest", "manifest_path", default=None, type=click.Path(), help="Path to .review/types.yaml.")
+@click.option("--work-dir", default=None, type=click.Path(), help="Local clone cache root.")
+@click.option("--serve/--no-serve", "serve_ui", default=True, help="Start the local UI server after writing artifacts (default on).")
+@click.option("--open/--no-open", "open_browser", default=True, help="Open the browser when the UI server starts.")
+@click.option("--port", "port", default=0, type=int, help="UI server port. 0 = OS-pick a free port.")
 def review(
     pr_url: str,
-    out_dir: str,
+    out_dir: Optional[str],
     llm_enrich: bool,
     llm_summarise: bool,
     include_tests: bool,
     debug_mermaid: bool,
     manifest_path: Optional[str],
     work_dir: Optional[str],
+    serve_ui: bool,
+    open_browser: bool,
+    port: int,
 ) -> None:
-    """Build the impact graph + briefing for a PR."""
-    out = Path(out_dir)
+    """Build the impact graph + briefing for a PR, then open the UI."""
+    # Resolve output dir before parsing so we know where artifacts will land.
+    if out_dir is None:
+        try:
+            _, pr_number = parse_pr_url(pr_url)
+            out = Path("output") / f"pr-{pr_number}"
+        except ValueError:
+            out = Path("output")
+    else:
+        out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
     work = Path(work_dir).expanduser() if work_dir else None
@@ -71,12 +101,10 @@ def review(
     brief_path = out / "brief.json"
     brief_path.write_text(brief.model_dump_json(indent=2) + "\n")
 
-    # Snapshot the resolved manifest (target repo or bundled default).
     manifest_resolved = find_manifest(repo_path=Path("."), override=manifest_p)
     if manifest_resolved is not None:
         shutil.copyfile(manifest_resolved, out / "manifest.snapshot.yaml")
 
-    # Auto-render the consumer-facing contract.
     write_contract(out / "CONTRACT.md", graph.pr)
 
     if debug_mermaid:
@@ -106,6 +134,27 @@ def review(
         f"risk_score: {brief.review.risk_score:.2f}  "
         f"advisory_flags: {brief.review.advisory_flags}"
     )
+
+    if not serve_ui:
+        return
+
+    try:
+        httpd, bound_port = serve(out, port=port)
+    except FileNotFoundError as e:
+        click.echo(f"⚠ {e}", err=True)
+        return
+
+    url = f"http://127.0.0.1:{bound_port}/"
+    click.echo("")
+    click.echo(f"  ↗ open {url}  (Ctrl+C to stop)")
+    if open_browser:
+        webbrowser.open(url)
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        click.echo("")
+        click.echo("  shutting down server …")
+        httpd.shutdown()
 
 
 if __name__ == "__main__":
