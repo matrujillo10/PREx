@@ -1,151 +1,186 @@
-# PREx — PR Experience
+# PREx — PR review reimagined for the AI-heavy code era
 
-PR review reimagined for the AI-heavy code era. One CLI command parses any GitHub pull request, builds a typed code graph + a generative-UI briefing, and opens an inline-Copilot review surface in your browser.
+> One CLI. One PR URL. A live, evidence-bearing review surface — with an inline Copilot that draws diagrams instead of typing walls of text.
 
-```
-$ prex review https://github.com/connectlyai/connectly-backend/pull/19858
-PR: connectlyai/connectly-backend#19858 — feat(agent-evaluation): add CSAT score filtering …
-Wrote output/pr-19858/graph.json and output/pr-19858/brief.json
-  changed symbols: 6  caller edges: 5  external refs: 2  risk signals: 3  plan steps: 7
-  pr_type: feat  risk_tier: sensitive  risk_score: 0.75
-
-  ↗ open http://127.0.0.1:54123/  (Ctrl+C to stop)
+```bash
+prex review https://github.com/connectlyai/connectly-backend/pull/19858
 ```
 
-Browser opens. You see:
+That's it. Browser opens. You see the diff with semantic overlays, and a chat that emits **typed visualisations** — coupling maps, blast-radius graphs, class diffs, sequence diagrams — drawn in real time as you ask questions.
 
-- **Hero** — risk badge, blast radius, advisory flags, change-density treemap.
-- **Plan** — ranked reading order with What / Why / Impact per step.
-- **Diff** — file tabs + hunks with intent + risk-signal overlays.
-- **Checklist** — manifest-driven items grouped by status (failed first).
-- **Citation drawer** — every prose claim is clickable; resolves to a graph node, edge, or `file:line`.
-- **Copilot** — inline chat (Anthropic Claude). Streams diagrams (treemap / coupling map / class diff / blast radius / data flow chain / sequence) instead of walls of text.
+---
+
+## Why this exists
+
+In 2026 most code is AI-written. Review didn't scale to match. The numbers from DORA / CodeRabbit / Anthropic internal data:
+
+- **Review time +441%.** Per-PR human review burden quadrupled.
+- **31% of PRs merge with zero review.** Rubber-stamping is the new default.
+- **Incidents per PR +242%.** Defect cost tripled.
+- **AI PRs ship 75% more logic errors and 2.74× more security issues** than human-written ones.
+
+Reviewers are the bottleneck and they're drowning. PREx is a reviewer-side product: it turns "12 files of unified diff" into a guided, citable, visual reading experience anchored in the actual code graph.
+
+---
+
+## What you get when you run it
+
+A localhost web app with two halves:
+
+### 1. The diff column — but with semantics
+Every hunk carries:
+- **Intent label** (`adds_capability`, `weakens_test`, `removes_dead`, …) decided by an LLM that read the patch.
+- **Risk-signal chips** (`sql_in_changed_lines`, `removes_assertion`, `broad_except`, `secret_like_string`, …) detected deterministically from AST + diff.
+- **One-liner** ("Adds `min_csat_score` field to `EvaluatedSessionsFilter` proto message") so you don't re-derive what changed on every read.
+- **Cite-back affordances** that resolve to graph node ids, edge ids, or file:line ranges.
+
+### 2. The Copilot — diagrams, not paragraphs
+Ask it anything. It picks the right *shape* and fills it with real graph data. Eight diagram types, all typed, all bound to live data:
+
+| Tool | When the agent picks it |
+|---|---|
+| `render_review_brief` | "give me the brief" / "what is this PR" |
+| `render_review_plan` | "where do I start" / "show the plan" |
+| `render_checklist` | "anything failed" / "what's missing" |
+| `render_treemap` | "where is the change densest" |
+| `render_coupling_map` | "anything sneaky" / "hidden coupling" |
+| `render_class_diff` | "what changed in this class" |
+| `render_blast_radius` | "who is affected by this" |
+| `render_data_flow_chain` | "how does X flow through" |
+| `render_sequence` | "show the SQL path" / "trace the calls" |
+
+The system prompt biases hard toward diagrams and ≤30-word captions. No "let me walk you through this in three paragraphs" replies.
+
+---
+
+## The unfair advantages
+
+### Hidden couplings nobody else surfaces
+PREx parses the whole repo, not just the diff. On the canonical demo PR ([connectlyai/connectly-backend#19858](https://github.com/connectlyai/connectly-backend/pull/19858)) it instantly catches that `EvaluatedSessionsFilter` is silently reused by an unrelated `ExportEvaluatedSessions` endpoint — adding a CSAT filter to one extends the other invisibly. The PR description never mentions it. Click "anything sneaky?" and the chat draws a coupling map with the implicit edge marked dashed-terracotta and labelled `LLM-inferred`.
+
+### Real blast radius, not vibes
+The graph counts callers. "This change touches 47 callers across 3 modules including the public RPC surface" is a number the UI shows on the hero card and the agent quotes when relevant. PR [#19654](https://github.com/connectlyai/connectly-backend/pull/19654) has 7 distinct lambdas downstream of one telemetry function — the blast-radius diagram makes it obvious in one glance.
+
+### Faithful by construction
+Every prose claim PREx renders carries a `cites` list. Click any sentence → a side drawer opens with the underlying evidence (a graph node, an edge, a `file:line` range, an external URL). LLM-derived facts get a visibly distinct chip. The reviewer never has to take an AI claim on faith.
+
+### Generative UI, real components
+The chat doesn't paste markdown. The agent emits *typed tool calls* — Anthropic Claude with structured tool-use, mapped 1:1 to React components. Every diagram is a real component bound to data, not a screenshot. Inputs are validated with Zod schemas; bad shapes can't render.
+
+### Pre-flight risk signals (no LLM)
+11 AST-derived risk signals fire deterministically per hunk:
+`auth_or_authz_touched · sql_in_changed_lines · external_io · removes_assertion · weakens_validation · raises_swallowed · broad_except · feature_flag_added · feature_flag_removed · secret_like_string · numeric_constant_changed_in_hot_loop`
+
+Plus 8 generic checklist predicates (`public_symbol_modified_without_test`, `external_ref_added`, `assertion_removed`, `broad_except_added`, `secret_like_string_added`, `no_doc_change_for_public_api`, `feature_flag_added`/`removed`) auto-evaluated against the manifest at `.review/types.yaml`.
+
+---
+
+## Try it on a real PR
+
+Four canonical validation PRs ship with the repo. Pick any:
+
+| PR | Why interesting |
+|---|---|
+| [#19858](https://github.com/connectlyai/connectly-backend/pull/19858) | **Smallest demo.** Surfaces the hidden Export-endpoint coupling. |
+| [#19872](https://github.com/connectlyai/connectly-backend/pull/19872) | Generated-stub forest; LLM disambiguator earns its keep. |
+| [#19654](https://github.com/connectlyai/connectly-backend/pull/19654) | Real blast radius — one symbol affects 7 lambdas. |
+| [#19701](https://github.com/connectlyai/connectly-backend/pull/19701) | 9,752-line stress test. 91 changed symbols, boto3 collisions auto-resolved. |
+
+Pre-built outputs for all four live in `examples/outputs/` so you can browse `brief.json` / `graph.json` / `CONTRACT.md` without running anything.
+
+---
 
 ## Install
 
 ```bash
 git clone git@github.com:matrujillo10/PREx.git
 cd PREx
-
-# Python toolchain (parser, server, agent)
 python3 -m venv .venv
 .venv/bin/pip install -e .
 
-# Anthropic key for the chat agent + brief LLM enrichment
+# anthropic key for the chat agent + optional --llm-summarise
 cp .env.example .env
 echo 'ANTHROPIC_API_KEY=sk-ant-...' >> .env
+
+# GitHub access uses the gh CLI
+gh auth login
 ```
 
-The UI bundle is **pre-built and committed** under `prex/_ui_dist/`. You don't need Node/npm to run PREx — only to develop the UI.
+The UI bundle is **pre-built and committed** under `prex/_ui_dist/`. You don't need Node or npm to run PREx — only to develop the UI.
 
-GitHub access uses the `gh` CLI; sign in once with `gh auth login`.
-
-## Usage
+## Use
 
 ```bash
-# Parse + serve UI + open browser
-prex review <PR-URL>
-
-# Without auto-open + pinned port
-prex review <PR-URL> --no-open --port 8765
-
-# Fill prose fields (headline, plan W/W/I, hunk one-liners) via Anthropic
-prex review <PR-URL> --llm-summarise
-
-# Disambiguate ambiguous cross-ref edges (Vertex AI, optional)
-prex review <PR-URL> --llm-enrich
-
-# Skip the server entirely; just write artifacts
-prex review <PR-URL> --no-serve
-
-# Run via module if `prex` isn't on PATH
+# parse + serve UI + open browser
 .venv/bin/python -m prex.cli review <PR-URL>
+
+# fill prose fields (headline, plan What/Why/Impact, hunk one-liners) before the UI loads
+.venv/bin/python -m prex.cli review <PR-URL> --llm-summarise
+
+# pin port / skip auto-open
+.venv/bin/python -m prex.cli review <PR-URL> --port 8765 --no-open
+
+# write artifacts only, don't start the server
+.venv/bin/python -m prex.cli review <PR-URL> --no-serve
 ```
 
-Per-run output lives at `output/pr-<number>/`:
+Each run drops four artifacts under `output/pr-<num>/`:
 
-| File | Purpose | Schema |
-|---|---|---|
-| `brief.json` | Briefing for the host LLM (read this first) | `prex/schemas/dist/brief.schema.json` |
-| `graph.json` | Full impact graph (deep store for citations) | `prex/schemas/dist/graph.schema.json` |
-| `manifest.snapshot.yaml` | Resolved `.review/types.yaml` used | (YAML) |
-| `CONTRACT.md` | Auto-rendered consumer contract | (Markdown) |
+| File | Read it as |
+|---|---|
+| `brief.json` | The briefing for the host LLM. Read this first. |
+| `graph.json` | The full code graph (deep store for citations). |
+| `manifest.snapshot.yaml` | The `.review/types.yaml` rules used. |
+| `CONTRACT.md` | Auto-rendered consumer contract (regenerated every run). |
 
-## Architecture
+JSON Schemas for both top-level docs live at `prex/schemas/dist/{brief,graph,combined}.schema.json`.
+
+---
+
+## Architecture, briefly
 
 ```
-                          ┌──────────────────────────┐
-   GitHub PR (gh CLI) ──> │  parse_pr (Python)       │
-                          │   tree-sitter symbols    │
-                          │   diff overlay           │
-                          │   cross-ref resolver     │
-                          │   manifest predicates    │
-                          │   optional LLM enrich    │
-                          └────────┬─────────────────┘
-                                   │
-                                   ▼
-                         output/pr-<n>/{graph,brief}.json
-                                   │
-            ┌──────────────────────┼──────────────────────────┐
-            ▼                      ▼                          ▼
-   GET /api/graph         GET /api/brief             POST /api/chat (SSE)
-                                                              │
-                                                              ▼
-                                                   prex/agent.py
-                                                   Anthropic Messages API
-                                                   (text deltas + tool_use)
-                                                              │
-                                                              ▼
-                                                  UI renders six A2GUI
-                                                  diagrams inline
+gh pr view ──┐
+             │   ┌──────────────────────────┐
+             ├──▶│  parse_pr   (Python)     │
+             │   │   tree-sitter symbols    │
+             │   │   diff overlay           │
+             │   │   cross-ref resolver     │
+             │   │   manifest predicates    │
+             │   │   optional LLM enrich    │
+             │   └────────┬─────────────────┘
+             │            │
+             ▼            ▼
+        graph.json    brief.json
+                          │
+        ┌─────────────────┼──────────────────────┐
+        ▼                 ▼                      ▼
+   GET /api/graph    GET /api/brief       POST /api/chat (SSE)
+                                                   │
+                                                   ▼
+                                          prex/agent.py
+                                          Anthropic Messages API
+                                          text deltas + tool_use
+                                                   │
+                                                   ▼
+                                          UI renders typed
+                                          A2GUI components
 ```
 
-### Python package (`prex/`)
+- **Python package** (`prex/`) — parser + schemas + manifest + server + agent + CLI. Everything ships in the pip wheel including the pre-built UI bundle.
+- **Server** is **stdlib `http.server`**. Three routes: `GET /api/{brief,graph}`, `POST /api/chat` (SSE).
+- **Agent** uses the Anthropic Python SDK directly — Messages API with streaming + tool use. 9 tools defined; system prompt biases toward visual replies.
+- **Frontend** (`prex-ui/`) — Vite + React + TypeScript + Zustand. CSS Modules + a single `tokens.css` from the design system. The terracotta accent is reserved exclusively for risk indicators.
+- **Diagrams** (`prex-ui/src/a2gui/`) — typed React components, raw SVG, Zod input schemas. Tool definitions on the agent side mirror the Zod schemas exactly so structured output can never mis-render.
 
-| Module | Job |
-|---|---|
-| `prex/cli.py` | `prex review` — parse → write artifacts → start server → open browser |
-| `prex/server.py` | stdlib `http.server`; serves the SPA + `/api/{brief,graph,chat}` |
-| `prex/agent.py` | Anthropic streaming + 6 A2GUI tool definitions |
-| `prex/parser/` | PR resolution, tree-sitter, diff overlay, cross-refs, brief builder |
-| `prex/manifest/` | `.review/types.yaml` reader + 8 generic predicates + auto-renders `CONTRACT.md` |
-| `prex/schemas/` | Pydantic v2 source of truth (`_shared`, `graph`, `brief`) + derived JSON Schemas in `dist/` |
-
-### Frontend (`prex-ui/`)
-
-| Path | Job |
-|---|---|
-| `src/App.tsx` | Hash router — Surface A `/`, Surface B `/step/:rank` |
-| `src/api/{client,types}.ts` | Fetch brief/graph; mirror Pydantic types |
-| `src/state/store.ts` | Zustand: selected step, drawer, active hunk, chat scope |
-| `src/layout/{AppFrame,CitationDrawer}.tsx` | Frame chrome + Surface C drawer |
-| `src/surfaces/{Review,Step}Surface.tsx` | The two main pages |
-| `src/components/{Hero,PlanColumn,DiffColumn,ChecklistColumn,HunkBlock,CitationLink,ChatShell}.tsx` | Region components |
-| `src/a2gui/` | 6 diagram components + Zod schemas + (`registerTools.tsx` for future CopilotKit handoff) |
-
-Tokens (`src/tokens.css`) are copied verbatim from the design handoff. The single terracotta accent is reserved for risk indicators only.
-
-## Outputs the chat agent can emit
-
-Six diagrams, each a typed React component bound to a Claude tool definition:
-
-| Tool | Use case |
-|---|---|
-| `render_treemap` | "where is the change densest" |
-| `render_coupling_map` | "anything sneaky" / "hidden coupling" |
-| `render_class_diff` | "what changed in this class" |
-| `render_blast_radius` | "who is affected" |
-| `render_data_flow_chain` | "how does X flow through" |
-| `render_sequence` | "show the SQL path" |
-
-The agent system prompt biases toward diagrams over prose; replies are typically a 1–3-sentence caption plus one or more diagrams.
+---
 
 ## Layout of the repo
 
 ```
 PREx/
 ├── prex/                # Python: parser, schemas, manifest, server, agent, CLI
-│   ├── _ui_dist/        # Pre-built UI bundle (committed; ships in pip wheel)
+│   ├── _ui_dist/        # Pre-built UI bundle (committed; ships in wheel)
 │   ├── schemas/dist/    # Generated JSON Schemas
 │   └── ...
 ├── prex-ui/             # Vite + React + TS source
@@ -154,39 +189,20 @@ PREx/
 │   └── outputs/pr-19{654,701,858,872}/   # Real outputs from 4 validation PRs
 ├── docs/wireframe-prompt.md       # Brief that drove the design handoff
 ├── context.md / decisions.md / research.md  # Project memory
-├── pyproject.toml / .env.example
 └── README.md            # this file
 ```
 
-## Validation PRs
-
-Run any of these to see the full pipeline against real code:
-
-| PR | Title | Why interesting |
-|---|---|---|
-| [#19858](https://github.com/connectlyai/connectly-backend/pull/19858) | feat(agent-evaluation): CSAT filtering | Smallest; surfaces hidden Export-endpoint coupling |
-| [#19872](https://github.com/connectlyai/connectly-backend/pull/19872) | feat[talk]: per-persona RPCs | Generated-stub forest; tests how the LLM disambiguator handles it |
-| [#19654](https://github.com/connectlyai/connectly-backend/pull/19654) | feat[team-agents]: OTEL metrics | Real blast radius — one symbol affects 7 lambdas |
-| [#19701](https://github.com/connectlyai/connectly-backend/pull/19701) | feat(knowledge): QA engine v2 (9k+ lines) | Stress test; 91 changed symbols, boto3 collisions |
-
-## Developing the UI
-
-```bash
-cd prex-ui
-npm install
-npm run dev        # Vite on :5173, proxies /api to :8765 (run `prex review --port 8765 --no-open` in another terminal)
-npm run build      # writes ../prex/_ui_dist/ — commit alongside source changes
-```
-
-`prex/_ui_dist/` is committed deliberately so `pip install -e .` is enough to run the UI without any Node tooling.
+---
 
 ## What ships next
 
-- Wire CopilotKit's runtime so `useFrontendTool` registrations in `prex-ui/src/a2gui/registerTools.tsx` become the call path (today the chat goes direct from `ChatShell.tsx` to `/api/chat`).
-- Stream brief.json incrementally so first paint shows the hero before plan steps land.
-- Type-conditional checklists (`feat`/`fix`/`chore` predicate sets) on top of today's generic ones.
+- Streaming `brief.json` so the UI paints the hero before the plan lands.
+- Type-conditional checklists (`feat`/`fix`/`chore`-specific predicate sets) on top of today's generic ones.
 - Cross-repo edges so a backend PR can flag dependent frontend repos.
+- CopilotKit runtime swap so the registered `useFrontendTool` definitions take over the chat path (today PREx talks to Anthropic directly via SSE).
 
-## License
+---
 
-Hackathon code; no license declared yet. Don't ship to prod without sorting that.
+## Credits
+
+Designed against four real PRs in `connectlyai/connectly-backend` (with permission). Hi-fi design handoff in `docs/wireframe-prompt.md`. Built in a hackathon. No license declared yet — don't ship to prod without sorting that.
