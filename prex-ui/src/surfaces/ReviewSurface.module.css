@@ -2,7 +2,11 @@
   display: grid;
   grid-template-columns: 320px 1fr 290px;
   border-bottom: 1px solid var(--border);
-  min-height: 540px;
+  /* Fixed height; each column scrolls internally so the chat region stays
+     close to the fold. */
+  height: 560px;
+  max-height: 60vh;
+  overflow: hidden;
 }
 
 .chat {
