@@ -7,6 +7,11 @@ Three call sites, in order:
 
 All output anchored to Citations from Build 1; validation rejects unsourced prose.
 Off unless the orchestrator passes `enabled=True` (driven by --llm-summarise).
+
+Backend: Anthropic Messages API directly (same key as the chat agent at
+prex/agent.py). litellm path removed — needed two adapters for the same
+provider, and litellm wrapped JSON in fences on Anthropic which made the
+extractor work harder. Override the model via PREX_LLM_MODEL.
 """
 from __future__ import annotations
 
@@ -17,6 +22,15 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
+
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv()
+except Exception:
+    pass
+
+import anthropic
 
 from prex.schemas._shared import Citation, Derivation, Diagnostic
 from prex.schemas.brief import (
@@ -38,9 +52,13 @@ from prex.schemas.graph import (
 
 _LOG = logging.getLogger("prex.brief_llm")
 
-# Default to Anthropic via litellm. Override with PREX_LLM_MODEL=vertex_ai/gemini-2.5-flash
-# (or any litellm-supported model id) when you want a different backend.
-DEFAULT_MODEL = os.environ.get("PREX_LLM_MODEL", "anthropic/claude-sonnet-4-5-20250929")
+# Anthropic model id. Strip the "anthropic/" prefix if present so users can
+# share PREX_LLM_MODEL with litellm-style ids.
+DEFAULT_MODEL = os.environ.get("PREX_LLM_MODEL", "claude-sonnet-4-5-20250929")
+if DEFAULT_MODEL.startswith("anthropic/"):
+    DEFAULT_MODEL = DEFAULT_MODEL[len("anthropic/") :]
+
+# Kept for backwards-compat with callers that still pass these kwargs; not used.
 DEFAULT_PROJECT = os.environ.get("VERTEXAI_PROJECT", "prex-hackathon")
 DEFAULT_LOCATION = os.environ.get("VERTEXAI_LOCATION", "us-central1")
 
@@ -49,44 +67,45 @@ MAX_HUNKS_PER_PR = 30
 
 
 def is_available() -> bool:
-    try:
-        import litellm  # noqa: F401
-    except Exception:
-        return False
-    return True
+    return bool(os.environ.get("ANTHROPIC_API_KEY"))
+
+
+_CLIENT_CACHE: Optional[anthropic.Anthropic] = None
+
+
+def _client() -> Optional[anthropic.Anthropic]:
+    global _CLIENT_CACHE
+    if _CLIENT_CACHE is not None:
+        return _CLIENT_CACHE
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        return None
+    _CLIENT_CACHE = anthropic.Anthropic(api_key=api_key)
+    return _CLIENT_CACHE
 
 
 def _call_llm(prompt: str, *, model: str, project: str, location: str) -> Optional[str]:
-    """Call the configured model via litellm.
-
-    Vertex AI requires `vertex_project` + `vertex_location`; Anthropic just needs
-    ANTHROPIC_API_KEY in env. We pass both kwargs unconditionally — litellm ignores
-    the ones that don't apply to the backend.
-    """
-    try:
-        import litellm
-    except Exception as e:
-        _LOG.warning("litellm not available: %s", e)
+    """Anthropic Messages API call returning the assistant text."""
+    client = _client()
+    if client is None:
+        _LOG.warning("ANTHROPIC_API_KEY not set; skipping LLM call.")
         return None
     try:
-        kwargs = dict(
+        resp = client.messages.create(
             model=model,
-            messages=[{"role": "user", "content": prompt}],
+            max_tokens=2048,
             temperature=0.0,
+            messages=[{"role": "user", "content": prompt}],
         )
-        if model.startswith("vertex_ai/"):
-            kwargs["vertex_project"] = project
-            kwargs["vertex_location"] = location
-            kwargs["response_format"] = {"type": "json_object"}
-        elif model.startswith("anthropic/"):
-            # Anthropic supports tool-style structured output; for JSON we hint via prompt.
-            pass
-        else:
-            kwargs["response_format"] = {"type": "json_object"}
-        resp = litellm.completion(**kwargs)
-        return resp.choices[0].message.content  # type: ignore[union-attr]
+        # Concatenate any text blocks; ignore tool_use here (this path is
+        # plain prose, no tools registered).
+        out_parts: List[str] = []
+        for block in resp.content:
+            if getattr(block, "type", "") == "text":
+                out_parts.append(getattr(block, "text", "") or "")
+        return "".join(out_parts) or None
     except Exception as e:
-        _LOG.warning("LLM call failed: %s", e)
+        _LOG.warning("Anthropic call failed: %s", e)
         return None
 
 
