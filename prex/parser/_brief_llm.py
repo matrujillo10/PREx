@@ -38,7 +38,9 @@ from prex.schemas.graph import (
 
 _LOG = logging.getLogger("prex.brief_llm")
 
-DEFAULT_MODEL = os.environ.get("PREX_LLM_MODEL", "vertex_ai/gemini-2.5-flash")
+# Default to Anthropic via litellm. Override with PREX_LLM_MODEL=vertex_ai/gemini-2.5-flash
+# (or any litellm-supported model id) when you want a different backend.
+DEFAULT_MODEL = os.environ.get("PREX_LLM_MODEL", "anthropic/claude-sonnet-4-5-20250929")
 DEFAULT_PROJECT = os.environ.get("VERTEXAI_PROJECT", "prex-hackathon")
 DEFAULT_LOCATION = os.environ.get("VERTEXAI_LOCATION", "us-central1")
 
@@ -55,20 +57,33 @@ def is_available() -> bool:
 
 
 def _call_llm(prompt: str, *, model: str, project: str, location: str) -> Optional[str]:
+    """Call the configured model via litellm.
+
+    Vertex AI requires `vertex_project` + `vertex_location`; Anthropic just needs
+    ANTHROPIC_API_KEY in env. We pass both kwargs unconditionally — litellm ignores
+    the ones that don't apply to the backend.
+    """
     try:
         import litellm
     except Exception as e:
         _LOG.warning("litellm not available: %s", e)
         return None
     try:
-        resp = litellm.completion(
+        kwargs = dict(
             model=model,
             messages=[{"role": "user", "content": prompt}],
-            vertex_project=project,
-            vertex_location=location,
             temperature=0.0,
-            response_format={"type": "json_object"},
         )
+        if model.startswith("vertex_ai/"):
+            kwargs["vertex_project"] = project
+            kwargs["vertex_location"] = location
+            kwargs["response_format"] = {"type": "json_object"}
+        elif model.startswith("anthropic/"):
+            # Anthropic supports tool-style structured output; for JSON we hint via prompt.
+            pass
+        else:
+            kwargs["response_format"] = {"type": "json_object"}
+        resp = litellm.completion(**kwargs)
         return resp.choices[0].message.content  # type: ignore[union-attr]
     except Exception as e:
         _LOG.warning("LLM call failed: %s", e)
