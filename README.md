@@ -61,7 +61,7 @@ The system prompt biases hard toward diagrams and ≤30-word captions. No "let m
 PREx parses the whole repo, not just the diff. On the canonical demo PR ([connectlyai/connectly-backend#19858](https://github.com/connectlyai/connectly-backend/pull/19858)) it instantly catches that `EvaluatedSessionsFilter` is silently reused by an unrelated `ExportEvaluatedSessions` endpoint — adding a CSAT filter to one extends the other invisibly. The PR description never mentions it. Click "anything sneaky?" and the chat draws a coupling map with the implicit edge marked dashed-terracotta and labelled `LLM-inferred`.
 
 ### Real blast radius, not vibes
-The graph counts callers. "This change touches 47 callers across 3 modules including the public RPC surface" is a number the UI shows on the hero card and the agent quotes when relevant. PR [#19654](https://github.com/connectlyai/connectly-backend/pull/19654) has 7 distinct lambdas downstream of one telemetry function — the blast-radius diagram makes it obvious in one glance.
+The graph counts callers. "This change touches N callers across M modules including the public RPC surface" is a number the UI shows on the hero card and the agent quotes when relevant. The blast-radius diagram makes the downstream picture obvious in one glance.
 
 ### Faithful by construction
 Every prose claim PREx renders carries a `cites` list. Click any sentence → a side drawer opens with the underlying evidence (a graph node, an edge, a `file:line` range, an external URL). LLM-derived facts get a visibly distinct chip. The reviewer never has to take an AI claim on faith.
