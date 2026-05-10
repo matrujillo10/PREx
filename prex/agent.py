@@ -387,13 +387,8 @@ SYSTEM_BASE = textwrap.dedent("""\
       - "how does X flow through" / "trace the field"                → render_data_flow_chain
       - "what's the sequence of calls" / "show me the SQL path"      → render_sequence
 
-    On the special user message "__GREETING__" (or when the reviewer first opens
-    the PR with no prior context), emit, IN ORDER:
-      1. render_review_brief
-      2. render_review_plan
-      3. render_checklist
-    Plus a ≤20-word welcome caption above. Use the brief data verbatim — do NOT
-    re-summarise; do NOT shorten; pass every field you have.
+    Wait for the reviewer to ask. Do not auto-render anything on the first turn
+    unless explicitly asked. The composer placeholder seeds reasonable openers.
 
     Faithfulness rules:
       - For tool args, derive ids from the graph node ids you have seen below; do not invent.

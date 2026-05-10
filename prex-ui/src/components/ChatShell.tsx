@@ -59,51 +59,28 @@ export function ChatShell({ scope }: Props) {
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
-  const greetedRef = useRef<string | null>(null);
 
   // Reset conversation when scope changes.
   useEffect(() => {
     abortRef.current?.abort();
     setTurns([]);
     setBusy(false);
-    greetedRef.current = null;
   }, [scope]);
 
   useEffect(() => () => abortRef.current?.abort(), []);
-
-  // Auto-greet on first mount of a scope so the chat opens with the brief +
-  // plan + checklist already rendered as A2GUI cards.
-  useEffect(() => {
-    if (greetedRef.current === scope) return;
-    greetedRef.current = scope;
-    sendInternal("__GREETING__");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scope]);
 
   const send = async () => {
     const trimmed = draft.trim();
     if (!trimmed || busy) return;
     setDraft("");
-    await sendInternal(trimmed);
-  };
-
-  const sendInternal = async (userText: string) => {
-    if (busy) return;
-    const isGreeting = userText === "__GREETING__";
-    // For the silent greeting we still want the assistant turn to render, but
-    // we skip showing the literal '__GREETING__' user bubble.
-    const next: Turn[] = isGreeting
-      ? [...turns]
-      : [...turns, { role: "user", text: userText }];
+    const next: Turn[] = [...turns, { role: "user", text: trimmed }];
     setTurns([...next, { role: "assistant", text: "" }]);
     setBusy(true);
 
     const controller = new AbortController();
     abortRef.current = controller;
     try {
-      const wireMessages = isGreeting
-        ? [...next.map((t) => ({ role: t.role, content: t.text })), { role: "user", content: "__GREETING__" }]
-        : next.map((t) => ({ role: t.role, content: t.text }));
+      const wireMessages = next.map((t) => ({ role: t.role, content: t.text }));
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
