@@ -2,10 +2,11 @@
   display: grid;
   grid-template-columns: 320px 1fr 290px;
   border-bottom: 1px solid var(--border);
-  /* Fixed height; each column scrolls internally so the chat region stays
-     close to the fold. */
-  height: 560px;
-  max-height: 60vh;
+  /* Tall enough to comfortably fit the plan overview + at least one full
+     step card; columns scroll internally so the chat region stays in view
+     just below the fold. */
+  height: 720px;
+  max-height: 78vh;
   overflow: hidden;
 }
 
