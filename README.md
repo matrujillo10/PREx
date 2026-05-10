@@ -79,16 +79,9 @@ Plus 8 generic checklist predicates (`public_symbol_modified_without_test`, `ext
 
 ## Try it on a real PR
 
-Four canonical validation PRs ship with the repo. Pick any:
+The canonical demo is [connectlyai/connectly-backend#19858](https://github.com/connectlyai/connectly-backend/pull/19858) — a small CSAT-filtering feature that turns out to silently extend an unrelated `Export` endpoint via a shared filter type. PREx surfaces that coupling immediately when you ask "anything sneaky?".
 
-| PR | Why interesting |
-|---|---|
-| [#19858](https://github.com/connectlyai/connectly-backend/pull/19858) | **Smallest demo.** Surfaces the hidden Export-endpoint coupling. |
-| [#19872](https://github.com/connectlyai/connectly-backend/pull/19872) | Generated-stub forest; LLM disambiguator earns its keep. |
-| [#19654](https://github.com/connectlyai/connectly-backend/pull/19654) | Real blast radius — one symbol affects 7 lambdas. |
-| [#19701](https://github.com/connectlyai/connectly-backend/pull/19701) | 9,752-line stress test. 91 changed symbols, boto3 collisions auto-resolved. |
-
-Pre-built outputs for all four live in `examples/outputs/` so you can browse `brief.json` / `graph.json` / `CONTRACT.md` without running anything.
+Pre-built outputs live in `examples/outputs/pr-19858/` so you can browse `brief.json` / `graph.json` / `CONTRACT.md` without running anything.
 
 ---
 
