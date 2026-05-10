@@ -128,7 +128,10 @@ export function AgentChatBubble({
       ].join("\n"),
       minSuggestions: 2,
       maxSuggestions: 4,
-      available: "always",
+      // "always" caused suggestion runs to flood the single langgraph
+      // worker on open and queue the kickoff run for 90+s. Generate
+      // suggestions only after the kickoff turn completes.
+      available: "after-first-message",
     },
     [analysis, selectedNode.id],
   );
