@@ -15,7 +15,7 @@ export function useRenderCodeDiffTool(): void {
       "Render a unified-diff patch for a single file with line-level coloring. Use when showing the user a specific hunk.",
     parameters: ParamsSchema,
     render: ({ path, patch }) => {
-      const lines = patch.split("\n");
+      const lines = (patch ?? "").split("\n");
       return (
         <div className="my-2 border border-gray-200 rounded-md overflow-hidden text-xs font-mono">
           <div className="bg-gray-100 px-3 py-1.5 font-semibold text-gray-700 border-b">

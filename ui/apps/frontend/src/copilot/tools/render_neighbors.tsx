@@ -34,8 +34,8 @@ export function useRenderNeighborsTool(): void {
     parameters: ParamsSchema,
     render: ({ upstream, downstream }) => (
       <div className="my-2 border border-gray-200 rounded-md p-2 flex gap-3 text-xs">
-        <Column title="Upstream" ids={upstream} color="text-blue-700" />
-        <Column title="Downstream" ids={downstream} color="text-amber-700" />
+        <Column title="Upstream" ids={upstream ?? []} color="text-blue-700" />
+        <Column title="Downstream" ids={downstream ?? []} color="text-amber-700" />
       </div>
     ),
   });
