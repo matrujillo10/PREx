@@ -127,9 +127,12 @@ function Row({
 }) {
   if (!text) return null;
   return (
-    <div className={highlight ? styles.impactHi : ""}>
+    <div className={`${styles.row} ${highlight ? styles.impactHi : ""}`}>
       <span className={styles.label}>{label}</span>
-      <span dangerouslySetInnerHTML={{ __html: maybeHighlight(text, label) }} />
+      <span
+        className={styles.text}
+        dangerouslySetInnerHTML={{ __html: maybeHighlight(text, label) }}
+      />
     </div>
   );
 }
