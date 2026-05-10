@@ -18,25 +18,24 @@ export function App() {
       .catch((e) => console.error("Failed to load brief/graph", e));
   }, [setData]);
 
-  if (!brief) {
-    return (
-      <AppFrame>
-        <div style={{ padding: 64, color: "var(--muted)" }}>
-          Loading PREx briefing…
-        </div>
-      </AppFrame>
-    );
-  }
-
+  // HashRouter must always wrap AppFrame because AppFrame's nav uses <Link>.
   return (
     <HashRouter>
       <AppFrame>
-        <Routes>
-          <Route path="/" element={<ReviewSurface />} />
-          <Route path="/step/:rank" element={<StepSurface />} />
-          <Route path="/graph" element={<GraphSurface />} />
-        </Routes>
-        <CitationDrawer />
+        {!brief ? (
+          <div style={{ padding: 64, color: "var(--muted)" }}>
+            Loading PREx briefing…
+          </div>
+        ) : (
+          <>
+            <Routes>
+              <Route path="/" element={<ReviewSurface />} />
+              <Route path="/step/:rank" element={<StepSurface />} />
+              <Route path="/graph" element={<GraphSurface />} />
+            </Routes>
+            <CitationDrawer />
+          </>
+        )}
       </AppFrame>
     </HashRouter>
   );
