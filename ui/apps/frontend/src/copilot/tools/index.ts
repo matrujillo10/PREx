@@ -3,18 +3,35 @@
 /**
  * GenUI tool registry.
  *
- * Each tool lives in its own file as a `useXxxTool()` hook that calls
- * CopilotKit's `useComponent`. Add a new tool by dropping a file here
- * and importing it into `useGraphCopilotTools` below.
+ * Each tool is one file exporting a `useXxxTool()` hook that wraps
+ * `useComponent` from `@copilotkit/react-core/v2`. To add a tool:
+ *   1. Drop a file here, e.g. `render_foo.tsx`.
+ *   2. Add `import { useRenderFooTool } from "./render_foo";` below.
+ *   3. Add `useRenderFooTool` to the `TOOL_HOOKS` array.
+ *   4. Document its name + parameters in `apps/agent/prompts/base.md`
+ *      so the agent knows it can call it.
  *
- * Tools are registered only while the chat bubble is mounted — they
- * scope to the v2 CopilotKitProvider higher in the tree.
+ * Hook ordering must be stable across renders — the array literal
+ * keeps it that way. Tools register only while the chat bubble is
+ * mounted (this hook is called from inside `AgentChatBubble`).
  */
 
 import { useRenderImpactTableTool } from "./render_impact_table";
 import { useRenderCodeDiffTool } from "./render_code_diff";
+import { useRenderVerdictTool } from "./render_verdict";
+import { useRenderNeighborsTool } from "./render_neighbors";
+import { useRenderOpenQuestionsTool } from "./render_open_questions";
+import { useRenderFileRefTool } from "./render_file_ref";
+
+const TOOL_HOOKS: ReadonlyArray<() => void> = [
+  useRenderVerdictTool,
+  useRenderImpactTableTool,
+  useRenderNeighborsTool,
+  useRenderOpenQuestionsTool,
+  useRenderCodeDiffTool,
+  useRenderFileRefTool,
+];
 
 export function useGraphCopilotTools(): void {
-  useRenderImpactTableTool();
-  useRenderCodeDiffTool();
+  for (const useTool of TOOL_HOOKS) useTool();
 }

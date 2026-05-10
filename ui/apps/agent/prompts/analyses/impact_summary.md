@@ -1,35 +1,35 @@
 # Analysis: impact_summary
 
-Goal: tell the reviewer **what this node's change actually affects**, in
-the smallest words possible, grounded in the graph.
+Tell the reviewer what this node's change actually affects. Compact.
 
-## Procedure
+## Required response shape
 
-1. **Classify the change.** Restate `kind` + `change_state` in one
-   sentence using the node's name/path/qualified_name.
-2. **Direct effects (downstream).** From the neighbors, list outgoing
-   edges where the *target* is affected by this node. Group by edge
-   type (`calls`, `references`, `defines`, `touches`, `contains`,
-   `imports`, `covers`, `external`).
-3. **Triggers (upstream).** From the neighbors, list incoming edges —
-   what depends on this node and may need to adapt.
-4. **Blast radius hint.** One short line: is this contained
-   (single-file private symbol), local (module-internal), or
-   cross-cutting (public symbol with cross-module callers /
-   external_ref)? Use the `public` flag and external_ref neighbors.
-5. **Render.** If there are 3+ affected neighbors, call
-   `render_impact_table` with rows
-   `{ node_id, relation: "downstream"|"upstream", edge_type, confidence }`.
-   If a hunk patch is the central artifact, call `render_code_diff`
-   with the hunk's `patch` and the file's `path`.
-6. **Open questions.** If a neighbor has `confidence: "ambiguous"` or
-   `"llm_inferred"`, flag it explicitly — its impact may be
-   misattributed. If `read_source` would clarify, call it; otherwise
-   list what's unverified.
+**Call exactly one render tool per response.** Pick the single best
+fit by this ladder (top-to-bottom; first match wins):
 
-## Style
+1. **Ungrounded / ambiguous** — neighbors with `confidence` of
+   `ambiguous` or `llm_inferred`, or you couldn't ground the answer
+   from context + at most one `read_source` call →
+   `render_open_questions`.
+2. **Hunk node, patch is the story** → `render_code_diff` with the
+   node's `path` and `patch`.
+3. **≥3 meaningful neighbors AND edge_type / confidence matters** →
+   `render_impact_table`.
+4. **1–6 neighbors, just need to name them** → `render_neighbors`
+   (split by upstream/downstream).
+5. **Otherwise (clean / contained / no neighbors of note)** →
+   `render_verdict` only.
 
-- Lead with the classification sentence. Keep total prose under ~150
-  words; let the rendered table carry the breadth.
-- Never list `unchanged` neighbors unless they're load-bearing for the
-  blast-radius judgment.
+Filter out `unchanged` neighbors unless load-bearing for the
+blast-radius judgment.
+
+## Prose
+
+**≤ 25 words**, one sentence framing the rendered tool. No tables,
+bullets, fenced code, or markdown headers in prose. If you'd need
+more words, you picked the wrong tool — re-pick.
+
+## Backend tool
+
+Call `read_source` at most once per turn, and only when the patch +
+neighbors are insufficient to answer.

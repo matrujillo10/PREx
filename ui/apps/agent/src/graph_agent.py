@@ -29,8 +29,8 @@ import os
 from pathlib import Path
 
 from langchain.agents import create_agent
-from langchain_anthropic import ChatAnthropic
 from langchain_core.tools import tool
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph.state import CompiledStateGraph
 
 from copilotkit import CopilotKitMiddleware
@@ -100,15 +100,17 @@ def read_source(path: str, start: int | None = None, end: int | None = None) -> 
         end: 1-indexed end line (inclusive). Optional. Requires `start`.
 
     Returns the requested lines, prefixed with their 1-indexed line
-    numbers. Fails if the path escapes the codebase root or doesn't exist.
+    numbers. Returns an ``ERROR: ...`` string (not an exception) for
+    expected failures (missing path, bad range, traversal) so the model
+    can adapt. Raises only on configuration errors (e.g. CODEBASE_ROOT
+    unset) which the model cannot recover from.
     """
     root = _resolve_codebase_root()
     target = (root / path).resolve()
-    # path-traversal guard
     if root not in target.parents and target != root:
-        raise ValueError(f"path {path!r} escapes CODEBASE_ROOT")
+        return f"ERROR: path {path!r} escapes CODEBASE_ROOT"
     if not target.is_file():
-        raise FileNotFoundError(f"no such file under CODEBASE_ROOT: {path}")
+        return f"ERROR: no such file under CODEBASE_ROOT: {path}"
 
     text = target.read_text(encoding="utf-8", errors="replace")
     lines = text.splitlines()
@@ -116,12 +118,13 @@ def read_source(path: str, start: int | None = None, end: int | None = None) -> 
         sl, el = 1, len(lines)
     else:
         if start is None:
-            raise ValueError("`end` provided without `start`")
+            return "ERROR: `end` provided without `start`"
         sl = start
         el = end if end is not None else start
     if sl < 1 or el < sl or sl > len(lines):
-        raise ValueError(
-            f"invalid line range {sl}-{el} for {path} (file has {len(lines)} lines)"
+        return (
+            f"ERROR: invalid line range {sl}-{el} for {path} "
+            f"(file has {len(lines)} lines)"
         )
     el = min(el, len(lines))
     width = len(str(el))
@@ -136,18 +139,29 @@ def read_source(path: str, start: int | None = None, end: int | None = None) -> 
 def build_graph_agent() -> CompiledStateGraph:
     """Compile the graph-diff analyst agent.
 
-    Model: Claude Sonnet 4.6 (latest Sonnet 4 minor — DO NOT downgrade).
-    Fails fast if `ANTHROPIC_API_KEY` is unset.
+    Model: Gemini Flash-Lite (same as the starter agent — keeps the
+    existing GEMINI_API_KEY wiring). Override the model id with
+    ``GEMINI_MODEL`` if you want a different tier.
+
+    Fails fast if neither ``GEMINI_API_KEY`` nor ``GOOGLE_API_KEY`` is set.
     """
-    api_key = os.getenv("ANTHROPIC_API_KEY")
+    api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
     if not api_key:
         raise RuntimeError(
-            "ANTHROPIC_API_KEY is unset. Set it in apps/agent/.env."
+            "GEMINI_API_KEY (or GOOGLE_API_KEY) is unset. "
+            "Set it in apps/agent/.env."
+        )
+
+    model_id = os.getenv("GEMINI_MODEL")
+    if not model_id:
+        raise RuntimeError(
+            "GEMINI_MODEL is unset. Set it in apps/agent/.env "
+            "(e.g. GEMINI_MODEL=gemini-3.1-flash-lite)."
         )
 
     system_prompt = _compose_system_prompt()
-    llm = ChatAnthropic(
-        model="claude-sonnet-4-6",
+    llm = ChatGoogleGenerativeAI(
+        model=model_id,
         temperature=0,
         api_key=api_key,
     )
